@@ -1,5 +1,6 @@
 #ifndef INVENTORY_SYSTEM_INVENTORY_H
 #define INVENTORY_SYSTEM_INVENTORY_H
+#include "DataBase.h"
 
 class Inventory {
 public:
@@ -8,10 +9,12 @@ public:
     ~Inventory();
 
     bool addItem();
-    bool editItem();
+    bool editItem(const int& id);
+    bool removeItem(const int& id);
     void listItems();
 
 private:
+    DataBase* dataBase_;
 };
 
 
