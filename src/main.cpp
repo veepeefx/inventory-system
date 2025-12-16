@@ -2,7 +2,20 @@
 #include <sstream>
 
 #include "Inventory.h"
+#include <QApplication>
 
+#include "MainWindow.h"
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    MainWindow window;
+    window.show();
+
+    return app.exec();
+}
+/*
 int main()
 {
     bool run = true;
@@ -74,3 +87,4 @@ int main()
         }
     }
 }
+*/
