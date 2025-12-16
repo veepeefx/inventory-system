@@ -39,7 +39,26 @@ bool Inventory::addItem()
 
 bool Inventory::editItem(const int& id)
 {
-    std::cout << "\nEditing item..." << std::endl;
+    std::cout << "\nEditing item... \nGive changed name and quantity" << std::endl;
+
+    std::string input;
+    getline(std::cin, input);
+
+    std::istringstream iss(input);
+
+    std::string tempName;
+    int tempQuantity;
+
+    if (!(iss >> tempName >> tempQuantity)) {
+        return false;
+    }
+    ItemUpdate item;
+    item.name = tempName;
+    item.quantity = tempQuantity;
+
+    if (!dataBase_->updateItem(id, item)) {
+        return false;
+    }
     return true;
 }
 

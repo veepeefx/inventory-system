@@ -13,6 +13,7 @@ public:
     ~DataBase();
 
     bool insertItem(const Item& item);
+    bool updateItem(const int& id, const ItemUpdate& item);
     bool deleteItem(const int& itemId);
     bool list_all();
 
@@ -20,6 +21,14 @@ private:
 
     sqlite3 *db = nullptr;
     void initTables();
+
+    // makes dynamically changing part of the sql query for updateItem function
+    std::string dynamicUpdateSqlStr(const ItemUpdate& item);
+
+    // dynamically binds all updated changes
+    // returns index for next bind (id)
+    int dynamicUpdateBinding(const ItemUpdate& item, sqlite3_stmt* stmt);
+
 };
 
 

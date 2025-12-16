@@ -1,4 +1,7 @@
 #include "DataBase.h"
+
+#include <functional>
+
 #include "sqlite3.h"
 
 #include <iostream>
@@ -57,14 +60,47 @@ bool DataBase::insertItem(const Item& item)
         std::cerr << "Can't prepare statement." << std::endl;
     }
 
-    sqlite3_bind_text(stmt, 1, item.name.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 2, item.productNumber.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_int(stmt, 3, item.quantity);
-    sqlite3_bind_text(stmt, 4, item.ean.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 5, item.selfLocation.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_double(stmt, 6, item.priceNoVat);
-    sqlite3_bind_double(stmt, 7, item.vat);
-    sqlite3_bind_double(stmt, 8, item.discount);
+    int index = 1;
+    sqlite3_bind_text(stmt, index++, item.name.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, index++, item.productNumber.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, index++, item.quantity);
+    sqlite3_bind_text(stmt, index++, item.ean.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, index++, item.selfLocation.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_double(stmt, index++, item.priceNoVat);
+    sqlite3_bind_double(stmt, index++, item.vat);
+    sqlite3_bind_double(stmt, index, item.discount);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Insert failed: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
+    return true;
+}
+
+bool DataBase::updateItem(const int& id, const ItemUpdate& item)
+{
+    std::string sqlDynamicPart = dynamicUpdateSqlStr(item);
+
+    // if nothing to update ending update
+    if (sqlDynamicPart.empty()) {
+        std::cerr << "Nothing to update" << std::endl;
+        return false;
+    }
+
+    std::string sql = "UPDATE items SET " + sqlDynamicPart +
+                      ", modified_at = datetime('now', 'localtime') WHERE id = ?";
+
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Can't prepare statement." << std::endl;
+        return false;
+    }
+
+    int indexForId = dynamicUpdateBinding(item, stmt);
+    sqlite3_bind_int(stmt, indexForId, id);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Insert failed: " << sqlite3_errmsg(db) << std::endl;
@@ -100,7 +136,14 @@ bool DataBase::deleteItem(const int& itemId)
         return false;
     }
 
+    int deletedRows = sqlite3_changes(db);
     sqlite3_finalize(stmt);
+
+    // checks that in the list had item with itemId
+    if (deletedRows == 0) {
+        return false;
+    }
+
     return true;
 }
 
@@ -108,6 +151,7 @@ bool DataBase::list_all()
 {
     const char* sqlListAll = "SELECT * FROM items";
     sqlite3_stmt* stmt;
+
     if (sqlite3_prepare_v2(db, sqlListAll, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Can't prepare statement." << std::endl;
         return false;
@@ -130,4 +174,59 @@ bool DataBase::list_all()
 
     sqlite3_finalize(stmt);
     return true;
+}
+
+std::string DataBase::dynamicUpdateSqlStr(const ItemUpdate &item)
+{
+    std::string res;
+
+    auto addField = [&](const std::string& fieldName) {
+        if (!res.empty()) {
+            res += ", ";
+        }
+        res += fieldName + " = ?";
+    };
+
+    if (item.name) { addField("name"); }
+    if (item.productNumber) { addField("product_number"); }
+    if (item.quantity) { addField("quantity"); }
+    if (item.ean) { addField("ean"); }
+    if (item.selfLocation) { addField("self_location"); }
+    if (item.priceNoVat) { addField("price_no_vat"); }
+    if (item.vat) { addField("vat"); }
+    if (item.discount) { addField("discount"); }
+
+    return res;
+}
+
+int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)
+{
+    int index = 1;
+
+    if (item.name) {
+        sqlite3_bind_text(stmt, index++, item.name->c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (item.productNumber) {
+        sqlite3_bind_text(stmt, index++, item.productNumber->c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (item.quantity) {
+        sqlite3_bind_int(stmt, index++, item.quantity.value());
+    }
+    if (item.ean) {
+        sqlite3_bind_text(stmt, index++, item.ean->c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (item.selfLocation) {
+        sqlite3_bind_text(stmt, index++, item.selfLocation->c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (item.priceNoVat) {
+        sqlite3_bind_double(stmt, index++, item.priceNoVat.value());
+    }
+    if (item.vat) {
+        sqlite3_bind_double(stmt, index++, item.vat.value());
+    }
+    if (item.discount) {
+        sqlite3_bind_double(stmt, index++, item.discount.value());
+    }
+
+    return index;
 }
