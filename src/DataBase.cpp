@@ -42,6 +42,7 @@ void DataBase::initTables()
         price_no_vat REAL DEFAULT 0.0,
         vat REAL DEFAULT 0.0,
         discount REAL NOT NULL DEFAULT 0.0,
+        description TEXT,
         modified_at TEXT DEFAULT (datetime('now', 'localtime')),
         created_at TEXT DEFAULT (datetime('now', 'localtime'))); )";
 
@@ -51,8 +52,8 @@ void DataBase::initTables()
 bool DataBase::insertItem(const Item& item)
 {
     const char* sqlInsert = R"(
-    INSERT INTO items (name, product_number, quantity, ean, self_location, price_no_vat, vat, discount)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?); )";
+    INSERT INTO items (name, product_number, quantity, ean, self_location, price_no_vat,
+                       vat, discount, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?); )";
 
     sqlite3_stmt* stmt;
 
@@ -68,7 +69,8 @@ bool DataBase::insertItem(const Item& item)
     sqlite3_bind_text(stmt, index++, item.selfLocation.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_double(stmt, index++, item.priceNoVat);
     sqlite3_bind_double(stmt, index++, item.vat);
-    sqlite3_bind_double(stmt, index, item.discount);
+    sqlite3_bind_double(stmt, index++, item.discount);
+    sqlite3_bind_text(stmt, index, item.description.c_str(), -1, SQLITE_TRANSIENT);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Insert failed: " << sqlite3_errmsg(db) << std::endl;
@@ -152,7 +154,7 @@ std::vector<Item> DataBase::getItems()
     std::vector<Item> items;
 
     const char* sql = "SELECT id, name, product_number, quantity, self_location, "
-                      "price_no_vat, vat, discount FROM items;";
+                      "price_no_vat, vat, discount, description FROM items;";
 
     sqlite3_stmt *stmt;
 
@@ -171,6 +173,7 @@ std::vector<Item> DataBase::getItems()
         item.priceNoVat = sqlite3_column_double(stmt, 5);
         item.vat = sqlite3_column_double(stmt, 6);
         item.discount = sqlite3_column_double(stmt, 7);
+        item.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 8));
 
         items.push_back(item);
     }
@@ -198,6 +201,7 @@ std::string DataBase::dynamicUpdateSqlStr(const ItemUpdate &item)
     if (item.priceNoVat) { addField("price_no_vat"); }
     if (item.vat) { addField("vat"); }
     if (item.discount) { addField("discount"); }
+    if (item.description) {addField("description"); }
 
     return res;
 }
@@ -229,6 +233,9 @@ int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)
     }
     if (item.discount) {
         sqlite3_bind_double(stmt, index++, item.discount.value());
+    }
+    if (item.description) {
+        sqlite3_bind_text(stmt, index++, item.description->c_str(), -1, SQLITE_TRANSIENT);
     }
 
     return index;

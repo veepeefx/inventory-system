@@ -19,7 +19,9 @@ add_executable(inventory-system src/main.cpp
         src/View/InventoryView.cpp
         src/View/InventoryView.h
         src/View/ItemTableModel.cpp
-        src/View/ItemTableModel.h)
+        src/View/ItemTableModel.h
+        src/View/ItemEditorDialog.cpp
+        src/View/ItemEditorDialog.h)
 
 include_directories(third-party)
 target_link_libraries(inventory-system PRIVATE Qt6::Widgets)

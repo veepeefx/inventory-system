@@ -12,7 +12,7 @@ MainWindow::MainWindow(DataBase* db, QWidget *parent) : QMainWindow(parent)
 
     viewStack_ = new QStackedWidget(this);
     viewStack_->addWidget(central);
-    viewStack_->addWidget(new InventoryView(db_));
+    viewStack_->addWidget(new InventoryView(db_, viewStack_));
 
     mainLayout_ = new QGridLayout(central);
 

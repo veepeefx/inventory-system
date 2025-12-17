@@ -13,6 +13,7 @@ struct Item {
     double priceNoVat = 0.0;
     double vat = 0.0;
     double discount = 0.0;
+    std::string description;
 };
 
 // used for updating item
@@ -25,6 +26,7 @@ struct ItemUpdate {
     std::optional<double> priceNoVat;
     std::optional<double> vat;
     std::optional<double> discount;
+    std::optional<std::string> description;
 };
 
 

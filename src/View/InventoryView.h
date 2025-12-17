@@ -1,8 +1,7 @@
 #ifndef INVENTORY_SYSTEM_INVENTORYVIEW_H
 #define INVENTORY_SYSTEM_INVENTORYVIEW_H
 
-#include <QWidget>
-#include <QVBoxLayout>
+#include <QStackedWidget>
 #include <QTableView>
 
 #include "ItemTableModel.h"
@@ -12,7 +11,7 @@ class InventoryView : public QWidget {
     Q_OBJECT
 
 public:
-    explicit InventoryView(DataBase* db, QWidget *parent = nullptr);
+    explicit InventoryView(DataBase* db, QStackedWidget* stack_, QWidget *parent = nullptr);
 
     ~InventoryView() override;
 
