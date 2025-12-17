@@ -147,33 +147,36 @@ bool DataBase::deleteItem(const int& itemId)
     return true;
 }
 
-bool DataBase::list_all()
+std::vector<Item> DataBase::getItems()
 {
-    const char* sqlListAll = "SELECT * FROM items";
-    sqlite3_stmt* stmt;
+    std::vector<Item> items;
 
-    if (sqlite3_prepare_v2(db, sqlListAll, -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Can't prepare statement." << std::endl;
-        return false;
+    const char* sql = "SELECT id, name, product_number, quantity, self_location, "
+                      "price_no_vat, vat, discount FROM items;";
+
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+        return {};
     }
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        std::cout << "ID: " << sqlite3_column_int(stmt, 0)
-        << ", Name: " << sqlite3_column_text(stmt, 1)
-        << ", Product number: " << sqlite3_column_text(stmt, 2)
-        << ", Quantity: " << sqlite3_column_int(stmt, 3)
-        << ", Ean: " << sqlite3_column_text(stmt, 4)
-        << ", Self location: " << sqlite3_column_text(stmt, 5)
-        << ", Price no vat: " << sqlite3_column_double(stmt, 6)
-        << ", Vat: " << sqlite3_column_double(stmt, 7)
-        << ", Discount: " << sqlite3_column_double(stmt, 8)
-        << ", Modified at: " << sqlite3_column_text(stmt, 9)
-        << ", Created at: " << sqlite3_column_text(stmt, 10)
-        << std::endl;
+        Item item;
+        item.id = sqlite3_column_int(stmt, 0);
+        item.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        item.productNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        item.quantity = sqlite3_column_int(stmt, 3);
+        item.selfLocation = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+        item.priceNoVat = sqlite3_column_double(stmt, 5);
+        item.vat = sqlite3_column_double(stmt, 6);
+        item.discount = sqlite3_column_double(stmt, 7);
+
+        items.push_back(item);
     }
 
     sqlite3_finalize(stmt);
-    return true;
+    return items;
 }
 
 std::string DataBase::dynamicUpdateSqlStr(const ItemUpdate &item)

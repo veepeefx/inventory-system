@@ -2,6 +2,7 @@
 #define INVENTORY_SYSTEM_DATABASE_H
 
 #include <string>
+#include <vector>
 
 #include "sqlite3.h"
 #include "Item.h"
@@ -15,7 +16,7 @@ public:
     bool insertItem(const Item& item);
     bool updateItem(const int& id, const ItemUpdate& item);
     bool deleteItem(const int& itemId);
-    bool list_all();
+    std::vector<Item> getItems();
 
 private:
 

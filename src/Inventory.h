@@ -4,17 +4,16 @@
 
 class Inventory {
 public:
-    Inventory();
+    Inventory(DataBase* db);
 
     ~Inventory();
 
     bool addItem();
     bool editItem(const int& id);
     bool removeItem(const int& id);
-    void listItems();
 
 private:
-    DataBase* dataBase_;
+    DataBase* db_;
 };
 
 

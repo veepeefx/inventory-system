@@ -3,21 +3,26 @@
 
 #include <QMainWindow>
 #include <QVBoxLayout>
+#include <QStackedWidget>
+
+#include "../DataBase.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(DataBase* db, QWidget *parent = nullptr);
 
     ~MainWindow() override;
 
 private:
+    DataBase* db_;
+
+    QStackedWidget* viewStack_;
     QGridLayout *mainLayout_;
     void initMainMenu();
 
-    int BASE_BUTTON_WIDTH = 200;
-    int BASE_BUTTON_HEIGHT = 75;
+    QSize BUTTON_SIZE = {200, 75};
 
 private slots:
     void onItemsButtonClicked();

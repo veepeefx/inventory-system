@@ -6,15 +6,10 @@
 #include "DataBase.h"
 
 
-Inventory::Inventory()
-{
-    dataBase_ = new DataBase("database.db");
-}
+Inventory::Inventory(DataBase* db) : db_(db)
+{}
 
-Inventory::~Inventory()
-{
-    delete dataBase_;
-}
+Inventory::~Inventory() {}
 
 bool Inventory::addItem()
 {
@@ -30,7 +25,7 @@ bool Inventory::addItem()
         return false;
     }
 
-    if (!dataBase_->insertItem(item)) {
+    if (!db_->insertItem(item)) {
         return false;
     }
 
@@ -56,7 +51,7 @@ bool Inventory::editItem(const int& id)
     item.name = tempName;
     item.quantity = tempQuantity;
 
-    if (!dataBase_->updateItem(id, item)) {
+    if (!db_->updateItem(id, item)) {
         return false;
     }
     return true;
@@ -65,15 +60,9 @@ bool Inventory::editItem(const int& id)
 bool Inventory::removeItem(const int& id)
 {
     std::cout << "\nRemoving item..." << std::endl;
-    if (!dataBase_->deleteItem(id)) {
+    if (!db_->deleteItem(id)) {
         return false;
     }
 
     return true;
-}
-
-void Inventory::listItems()
-{
-    std::cout << "\nItems in inventory:" << std::endl;
-    dataBase_->list_all();
 }

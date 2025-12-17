@@ -2,14 +2,23 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+#include "InventoryView.h"
+
+MainWindow::MainWindow(DataBase* db, QWidget *parent) : QMainWindow(parent)
 {
-    QWidget *central = new QWidget(this);
+    db_ = db;
+
+    QWidget *central = new QWidget();
+
+    viewStack_ = new QStackedWidget(this);
+    viewStack_->addWidget(central);
+    viewStack_->addWidget(new InventoryView(db_));
+
     mainLayout_ = new QGridLayout(central);
 
     initMainMenu();
 
-    setCentralWidget(central);
+    setCentralWidget(viewStack_);
     setWindowTitle("Inventory System");
     resize(800, 600);
 }
@@ -23,13 +32,13 @@ void MainWindow::initMainMenu()
     QPushButton* settingsButton = new QPushButton("Settings");
     QPushButton* exitButton = new QPushButton("Exit");
 
-    itemsButton->setFixedSize(BASE_BUTTON_WIDTH, BASE_BUTTON_HEIGHT);
-    itemTypeButton->setFixedSize(BASE_BUTTON_WIDTH, BASE_BUTTON_HEIGHT);
-    settingsButton->setFixedSize(BASE_BUTTON_WIDTH, BASE_BUTTON_HEIGHT);
-    exitButton->setFixedSize(BASE_BUTTON_WIDTH, BASE_BUTTON_HEIGHT);
+    itemsButton->setFixedSize(BUTTON_SIZE);
+    itemTypeButton->setFixedSize(BUTTON_SIZE);
+    settingsButton->setFixedSize(BUTTON_SIZE);
+    exitButton->setFixedSize(BUTTON_SIZE);
 
     connect(itemsButton, &QPushButton::clicked, this, &MainWindow::onItemsButtonClicked);
-    connect(itemTypeButton, &QPushButton::clicked, this, &MainWindow::onItemsButtonClicked);
+    connect(itemTypeButton, &QPushButton::clicked, this, &MainWindow::onItemTypeButtonClicked);
     connect(settingsButton, &QPushButton::clicked, this, &MainWindow::onSettingsButtonClicked);
     connect(exitButton, &QPushButton::clicked, this, &MainWindow::onExitButtonClicked);
 
@@ -41,12 +50,11 @@ void MainWindow::initMainMenu()
 
 void MainWindow::onItemsButtonClicked()
 {
-
+    viewStack_->setCurrentIndex(1);
 }
 
 void MainWindow::onItemTypeButtonClicked()
 {
-
 }
 
 void MainWindow::onSettingsButtonClicked()
