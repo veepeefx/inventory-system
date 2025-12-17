@@ -1,5 +1,6 @@
 #include "ItemEditorDialog.h"
 
+#include <iostream>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -10,26 +11,13 @@
 
 ItemEditorDialog::ItemEditorDialog(DataBase* db, QWidget *parent) : QDialog(parent), db_(db)
 {
-    setWindowTitle("Item Editor");
     mainLayout_ = new QVBoxLayout(this);
 
     initEditor();
+    initControls();
 
-    QPushButton* cancelButton = new QPushButton("Cancel", this);
-    QPushButton* saveButton = new QPushButton("Save", this);
-
-    connect(cancelButton, &QPushButton::clicked, this, &ItemEditorDialog::close);
-    connect(saveButton, &QPushButton::clicked, this, &ItemEditorDialog::saveButtonClicked);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->addWidget(cancelButton);
-    buttonLayout->addWidget(saveButton);
-
-    mainLayout_->addLayout(buttonLayout);
-    mainLayout_->setAlignment(Qt::AlignCenter);
-
+    setWindowTitle("Item Editor");
     resize(800,500);
-    QDialog::exec();
 }
 
 ItemEditorDialog::~ItemEditorDialog() {}
@@ -141,6 +129,22 @@ void ItemEditorDialog::initEditor()
 
     mainLayout_->addLayout(editorLayout);
 }
+
+void ItemEditorDialog::initControls()
+{
+    QPushButton* cancelButton = new QPushButton("Cancel", this);
+    QPushButton* saveButton = new QPushButton("Save", this);
+
+    connect(cancelButton, &QPushButton::clicked, this, &ItemEditorDialog::reject);
+    connect(saveButton, &QPushButton::clicked, this, &ItemEditorDialog::saveButtonClicked);
+
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(saveButton);
+
+    mainLayout_->addLayout(buttonLayout);
+}
+
 void ItemEditorDialog::newItem()
 {
 
@@ -153,5 +157,41 @@ void ItemEditorDialog::loadItem()
 
 void ItemEditorDialog::saveButtonClicked()
 {
+    // new item
+    if (loadedItem == nullptr) {
 
+        Item newItem;
+        newItem.name = nameLineEdit_->text().toStdString();
+        newItem.productNumber = productNumberLineEdit_->text().toStdString();
+        newItem.quantity = quantityLineEdit_->text().toInt();
+        //newItem.ean = eanLineEdit->text().toStdString();
+        newItem.selfLocation = selfLocationLineEdit_->text().toStdString();
+        newItem.priceNoVat = priceNoVatLineEdit_->text().toDouble();
+        newItem.vat = vatLineEdit_->text().toDouble();
+        newItem.discount = discountLineEdit_->text().toDouble();
+        newItem.description = descriptionTextEdit_->toPlainText().toStdString();
+
+        if (!db_->insertItem(newItem)) {
+            // MAKE ERROR POP UP HERE
+            return;
+        }
+
+    // updating item
+    } else {
+
+        ItemUpdate updateItem;
+
+        if (loadedItem->name != nameLineEdit_->text().toStdString()) {
+            updateItem.name = nameLineEdit_->text().toStdString();
+        }
+        if (loadedItem->productNumber != productNumberLineEdit_->text().toStdString()) {
+            updateItem.productNumber = productNumberLineEdit_->text().toStdString();
+        }
+        if (loadedItem->quantity != quantityLineEdit_->text().toInt()) {
+            updateItem.quantity = quantityLineEdit_->text().toInt();
+        }
+    }
+
+    emit itemUpdated();
+    accept();
 }

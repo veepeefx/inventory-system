@@ -20,10 +20,11 @@ private:
 
     QTableView* table_;
     ItemTableModel* model_;
+    DataBase* db_;
 
+private slots:
 
-private
-    slots:
+    void updateInventoryView();
 };
 
 

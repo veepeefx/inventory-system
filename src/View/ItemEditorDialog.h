@@ -22,6 +22,7 @@ public:
 private:
     DataBase* db_;
     QVBoxLayout *mainLayout_;
+    Item* loadedItem = nullptr;
 
     QLineEdit *idLineEdit_;
     QLineEdit* productNumberLineEdit_;
@@ -38,12 +39,16 @@ private:
     QLineEdit* createdLineEdit_;
 
     void initEditor();
+    void initControls();
+
     void saveItem();
     void cancel();
     void loadItem();
 
-private
-    slots:
+signals:
+    void itemUpdated();
+
+private slots:
 
     void saveButtonClicked();
 };

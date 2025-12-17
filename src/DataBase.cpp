@@ -36,12 +36,12 @@ void DataBase::initTables()
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         product_number TEXT,
-        quantity INTEGER NOT NULL DEFAULT 0,
+        quantity INTEGER DEFAULT 0,
         ean TEXT,
         self_location TEXT,
         price_no_vat REAL DEFAULT 0.0,
         vat REAL DEFAULT 0.0,
-        discount REAL NOT NULL DEFAULT 0.0,
+        discount REAL DEFAULT 0.0,
         description TEXT,
         modified_at TEXT DEFAULT (datetime('now', 'localtime')),
         created_at TEXT DEFAULT (datetime('now', 'localtime'))); )";
@@ -53,12 +53,14 @@ bool DataBase::insertItem(const Item& item)
 {
     const char* sqlInsert = R"(
     INSERT INTO items (name, product_number, quantity, ean, self_location, price_no_vat,
-                       vat, discount, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?); )";
+                       vat, discount, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?); )";
 
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(db, sqlInsert, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Can't prepare statement." << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
     }
 
     int index = 1;

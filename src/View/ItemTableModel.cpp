@@ -30,7 +30,7 @@ QVariant ItemTableModel::data(const QModelIndex& index, int role) const
 
     const Item& item = items_[index.row()];
 
-    const double price = item.priceNoVat * (1 + item.vat) * (1 - item.discount/100);
+    const double price = item.priceNoVat * (1 + item.vat/100) * (1 - item.discount/100);
 
     switch (index.column()) {
         case 0: return item.productNumber.data();

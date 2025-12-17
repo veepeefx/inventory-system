@@ -7,12 +7,13 @@
 #include "ItemEditorDialog.h"
 
 
-InventoryView::InventoryView(DataBase* db, QStackedWidget* stack, QWidget *parent) : QWidget(parent)
+InventoryView::InventoryView(DataBase* db, QStackedWidget* stack, QWidget *parent)
+: QWidget(parent), db_(db)
 {
     table_ = new QTableView(this);
     model_ = new ItemTableModel(this);
 
-    model_->setData(db->getItems());
+    model_->setData(db_->getItems());
     table_->setModel(model_);
 
     QHBoxLayout* controlLayout = new QHBoxLayout();
@@ -22,9 +23,10 @@ InventoryView::InventoryView(DataBase* db, QStackedWidget* stack, QWidget *paren
     QPushButton* backButton = new QPushButton("Back");
 
     connect(addButton, &QPushButton::clicked, this, [this, db]() {
-        new ItemEditorDialog(db, this);
+        ItemEditorDialog* dialog = new ItemEditorDialog(db, this);
+        connect(dialog, &ItemEditorDialog::itemUpdated, this, &InventoryView::updateInventoryView);
+        dialog->exec();
     });
-
 
     connect(backButton, &QPushButton::clicked, this, [stack]() {
         stack->setCurrentIndex(0); // index 0 is mainmenu
@@ -41,3 +43,8 @@ InventoryView::InventoryView(DataBase* db, QStackedWidget* stack, QWidget *paren
 }
 
 InventoryView::~InventoryView() {}
+
+void InventoryView::updateInventoryView()
+{
+    model_->setData(db_->getItems());
+}
