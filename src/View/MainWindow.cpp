@@ -12,11 +12,16 @@ MainWindow::MainWindow(DataBase* db, QWidget *parent) : QMainWindow(parent)
 
     viewStack_ = new QStackedWidget(this);
     viewStack_->addWidget(central);
-    viewStack_->addWidget(new InventoryView(db_, viewStack_));
+
+    InventoryView* itemInventory = new InventoryView(db_);
+    viewStack_->addWidget(itemInventory);
 
     mainLayout_ = new QGridLayout(central);
 
     initMainMenu();
+
+    // return feature for InventoryView
+    connect(itemInventory, &InventoryView::returnMainMenu, this, &MainWindow::switchViewToMainMenu);
 
     setCentralWidget(viewStack_);
     setWindowTitle("Inventory System");
@@ -65,4 +70,9 @@ void MainWindow::onSettingsButtonClicked()
 void MainWindow::onExitButtonClicked()
 {
     this->close();
+}
+
+void MainWindow::switchViewToMainMenu()
+{
+    viewStack_->setCurrentIndex(0);
 }

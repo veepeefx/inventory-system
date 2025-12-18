@@ -41,6 +41,11 @@ void ItemEditorDialog::initEditor()
     editorLayout->addWidget(productNumberLabel, row, 0, 1, 1);
     editorLayout->addWidget(productNumberLineEdit_, row, 1, 1, 1);
 
+    QLabel *eanLabel = new QLabel("Ean:", this);
+    eanLineEdit_ = new QLineEdit(this);
+    editorLayout->addWidget(eanLabel, row, 2, 1, 1);
+    editorLayout->addWidget(eanLineEdit_, row, 3, 1, 1);
+
     row++;
 
     QLabel *nameLabel = new QLabel("Name:", this);
@@ -150,9 +155,29 @@ void ItemEditorDialog::newItem()
 
 }
 
-void ItemEditorDialog::loadItem()
+void ItemEditorDialog::openItem(Item* item)
 {
+    // setting loadedItem
+    loadedItem = item;
 
+    idLineEdit_->setText(QString::number(item->id));
+    nameLineEdit_->setText(QString::fromStdString(item->name));
+    productNumberLineEdit_->setText(QString::fromStdString(item->productNumber));
+    quantityLineEdit_->setText(QString::number(item->quantity));
+    eanLineEdit_->setText(QString::fromStdString(item->ean));
+    selfLocationLineEdit_->setText(QString::fromStdString(item->selfLocation));
+    priceNoVatLineEdit_->setText(QString::number(item->priceNoVat));
+    vatLineEdit_->setText(QString::number(item->vat));
+    discountLineEdit_->setText(QString::number(item->discount));
+    descriptionTextEdit_->setText(QString::fromStdString(item->description));
+
+    double price = item->priceNoVat * (1 + item->vat / 100);
+    priceLineEdit_->setText(QString::number(price));
+
+    double discountedPrice = price * (1 - item->discount / 100);
+    discountedPriceLineEdit_->setText(QString::number(discountedPrice));
+
+    // last modified and creation date
 }
 
 void ItemEditorDialog::saveButtonClicked()
@@ -164,7 +189,7 @@ void ItemEditorDialog::saveButtonClicked()
         newItem.name = nameLineEdit_->text().toStdString();
         newItem.productNumber = productNumberLineEdit_->text().toStdString();
         newItem.quantity = quantityLineEdit_->text().toInt();
-        //newItem.ean = eanLineEdit->text().toStdString();
+        newItem.ean = eanLineEdit_->text().toStdString();
         newItem.selfLocation = selfLocationLineEdit_->text().toStdString();
         newItem.priceNoVat = priceNoVatLineEdit_->text().toDouble();
         newItem.vat = vatLineEdit_->text().toDouble();
@@ -175,6 +200,8 @@ void ItemEditorDialog::saveButtonClicked()
             // MAKE ERROR POP UP HERE
             return;
         }
+        // removing loaded item
+        loadedItem = nullptr;
 
     // updating item
     } else {
@@ -190,6 +217,26 @@ void ItemEditorDialog::saveButtonClicked()
         if (loadedItem->quantity != quantityLineEdit_->text().toInt()) {
             updateItem.quantity = quantityLineEdit_->text().toInt();
         }
+        if (loadedItem->ean != eanLineEdit_->text().toStdString()) {
+            updateItem.ean = eanLineEdit_->text().toStdString();
+        }
+        if (loadedItem->selfLocation != selfLocationLineEdit_->text().toStdString()) {
+            updateItem.selfLocation = selfLocationLineEdit_->text().toStdString();
+        }
+        if (loadedItem->priceNoVat !=  priceNoVatLineEdit_->text().toDouble()) {
+            updateItem.priceNoVat = priceNoVatLineEdit_->text().toDouble();
+        }
+        if (loadedItem->vat != vatLineEdit_->text().toDouble()) {
+            updateItem.vat = vatLineEdit_->text().toDouble();
+        }
+        if (loadedItem->discount != discountLineEdit_->text().toDouble()) {
+            updateItem.discount = discountLineEdit_->text().toDouble();
+        }
+        if (loadedItem->description != descriptionTextEdit_->toPlainText().toStdString()) {
+            updateItem.description = descriptionTextEdit_->toPlainText().toStdString();
+        }
+
+        db_->updateItem(loadedItem->id, updateItem);
     }
 
     emit itemUpdated();

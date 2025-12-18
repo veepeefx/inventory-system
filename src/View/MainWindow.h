@@ -29,6 +29,8 @@ private slots:
     void onItemTypeButtonClicked();
     void onSettingsButtonClicked();
     void onExitButtonClicked();
+
+    void switchViewToMainMenu();
 };
 
 

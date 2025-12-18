@@ -45,6 +45,11 @@ QVariant ItemTableModel::data(const QModelIndex& index, int role) const
     return {};
 }
 
+Item* ItemTableModel::getItem(const int& row)
+{
+    return &items_.at(row);
+}
+
 QVariant ItemTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole || orientation != Qt::Horizontal) {

@@ -17,16 +17,17 @@ public:
     ~ItemEditorDialog() override;
 
     void newItem();
-    void openItem();
+    void openItem(Item* item);
 
 private:
     DataBase* db_;
     QVBoxLayout *mainLayout_;
     Item* loadedItem = nullptr;
 
-    QLineEdit *idLineEdit_;
+    QLineEdit* idLineEdit_;
     QLineEdit* productNumberLineEdit_;
-    QLineEdit *nameLineEdit_;
+    QLineEdit* eanLineEdit_;
+    QLineEdit* nameLineEdit_;
     QLineEdit* priceLineEdit_;
     QLineEdit* priceNoVatLineEdit_;
     QLineEdit* vatLineEdit_;

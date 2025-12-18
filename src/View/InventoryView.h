@@ -11,7 +11,7 @@ class InventoryView : public QWidget {
     Q_OBJECT
 
 public:
-    explicit InventoryView(DataBase* db, QStackedWidget* stack_, QWidget *parent = nullptr);
+    explicit InventoryView(DataBase* db, QWidget *parent = nullptr);
 
     ~InventoryView() override;
 
@@ -22,9 +22,16 @@ private:
     ItemTableModel* model_;
     DataBase* db_;
 
+    void initInventoryControls();
+
+signals:
+    void returnMainMenu();
+
 private slots:
 
     void updateInventoryView();
+
+    void openItemEditor(Item* item);
 };
 
 
