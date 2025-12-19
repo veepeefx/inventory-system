@@ -14,6 +14,8 @@ struct Item {
     double vat = 0.0;
     double discount = 0.0;
     std::string description;
+    std::string modifiedAt;
+    std::string createdAt;
 };
 
 // used for updating item

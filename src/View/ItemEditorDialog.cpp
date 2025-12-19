@@ -120,11 +120,13 @@ void ItemEditorDialog::initEditor()
 
     QLabel* lastModifiedLabel = new QLabel("Last Modified:", this);
     lastModifiedLineEdit_ = new QLineEdit(this);
+    lastModifiedLineEdit_->setDisabled(true);
     editorLayout->addWidget(lastModifiedLabel, row, 0, 1, 1);
     editorLayout->addWidget(lastModifiedLineEdit_, row, 1, 1, 1);
 
     QLabel* createdLabel = new QLabel("Created:", this);
     createdLineEdit_ = new QLineEdit(this);
+    createdLineEdit_->setDisabled(true);
     editorLayout->addWidget(createdLabel, row, 2, 1, 1);
     editorLayout->addWidget(createdLineEdit_, row, 3, 1, 1);
 
@@ -174,6 +176,8 @@ void ItemEditorDialog::loadItem(Item* item)
         discountedPriceLineEdit_->setText(QString::number(discountedPrice));
 
         // last modified and creation date
+        lastModifiedLineEdit_->setText(QString::fromStdString(item->modifiedAt));
+        createdLineEdit_->setText(QString::fromStdString(item->createdAt));
     }
 }
 

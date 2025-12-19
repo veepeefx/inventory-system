@@ -156,7 +156,8 @@ std::vector<Item> DataBase::getItems()
     std::vector<Item> items;
 
     const char* sql = "SELECT id, name, product_number, quantity, ean, self_location, "
-                      "price_no_vat, vat, discount, description FROM items;";
+                      "price_no_vat, vat, discount, description, modified_at, created_at "
+                      "FROM items;";
 
     sqlite3_stmt *stmt;
 
@@ -179,6 +180,8 @@ std::vector<Item> DataBase::getItems()
         item.vat = sqlite3_column_double(stmt, index++);
         item.discount = sqlite3_column_double(stmt, index++);
         item.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.modifiedAt = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.createdAt = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
 
         items.push_back(item);
     }

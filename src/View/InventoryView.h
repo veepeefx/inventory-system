@@ -23,6 +23,7 @@ private:
     DataBase* db_;
 
     void initInventoryControls();
+    int selectedRowIndex() const;
 
 signals:
     void returnMainMenu();
@@ -31,6 +32,9 @@ private slots:
 
     void updateInventoryView();
     void openItemEditor(Item* item = nullptr);
+
+    void removeButtonClicked();
+    void editButtonClicked();
 };
 
 

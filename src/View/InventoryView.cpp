@@ -36,28 +36,8 @@ void InventoryView::initInventoryControls()
     QPushButton* backButton = new QPushButton("Back");
 
     connect(addButton, &QPushButton::clicked, this, [this]() { openItemEditor(); });
-
-    connect(removeButton, &QPushButton::clicked, this, [this]() {
-        QItemSelectionModel* selection = table_->selectionModel();
-        QModelIndexList rows = selection->selectedRows();
-        if (!rows.isEmpty()) {
-            // open editor
-            int row = rows.first().row();
-            db_->deleteItem(model_->getItem(row)->id);
-            updateInventoryView();
-        }
-    });
-
-    connect(editButton, &QPushButton::clicked, this, [this]() {
-       QItemSelectionModel* selection = table_->selectionModel();
-        QModelIndexList rows = selection->selectedRows();
-        if (!rows.isEmpty()) {
-            // open editor
-            int row = rows.first().row();
-            openItemEditor(model_->getItem(row));
-        }
-    });
-
+    connect(removeButton, &QPushButton::clicked, this, &InventoryView::removeButtonClicked);
+    connect(editButton, &QPushButton::clicked, this, &InventoryView::editButtonClicked);
     connect(backButton, &QPushButton::clicked, this, [this]() { emit returnMainMenu(); });
 
     controlLayout->addWidget(addButton);
@@ -66,6 +46,21 @@ void InventoryView::initInventoryControls()
     controlLayout->addWidget(backButton);
 
     mainLayout_->addLayout(controlLayout);
+}
+
+int InventoryView::selectedRowIndex() const
+{
+    QItemSelectionModel* selection = table_->selectionModel();
+    QModelIndexList rows = selection->selectedRows();
+
+    int row;
+    if (rows.isEmpty()) {
+        row = -1;
+    } else {
+        row = rows.first().row();
+    }
+
+    return row;
 }
 
 void InventoryView::updateInventoryView()
@@ -80,6 +75,24 @@ void InventoryView::openItemEditor(Item* item)
 
     // load item to editor
     dialog->loadItem(item);
-
     dialog->exec();
+}
+
+void InventoryView::removeButtonClicked()
+{
+    int row = selectedRowIndex();
+
+    if (row >= 0) {
+        db_->deleteItem(model_->getItem(row)->id);
+        updateInventoryView();
+    }
+}
+
+void InventoryView::editButtonClicked()
+{
+    int row = selectedRowIndex();
+
+    if (row >= 0) {
+        openItemEditor(model_->getItem(row));
+    }
 }
