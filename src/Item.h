@@ -18,7 +18,7 @@ struct Item {
     std::string createdAt;
 };
 
-// used for updating item
+// used for updating existing item
 struct ItemUpdate {
     std::optional<std::string> name;
     std::optional<std::string> productNumber;

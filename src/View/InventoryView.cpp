@@ -23,6 +23,10 @@ InventoryView::InventoryView(DataBase& db, QWidget *parent)
     mainLayout_->addWidget(table_);
 
     initInventoryControls();
+
+    // removing visual focus from table
+    table_->clearSelection();
+    table_->setCurrentIndex(QModelIndex());
 }
 
 InventoryView::~InventoryView() {}

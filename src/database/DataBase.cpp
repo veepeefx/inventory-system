@@ -37,6 +37,11 @@ void DataBase::initTables()
 
 bool DataBase::insertItem(const Item& item)
 {
+    // must have name or product number in order to add
+    if (item.name.empty() && item.productNumber.empty()) {
+        return false;
+    }
+
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(db, Sql::Items::INSERT, -1, &stmt, nullptr) != SQLITE_OK) {
@@ -66,9 +71,18 @@ bool DataBase::insertItem(const Item& item)
     return true;
 }
 
-bool DataBase::updateItem(const int& id, const ItemUpdate& item)
+bool DataBase::updateItem(const ItemUpdate& updateItem, const int& itemId,
+                          const std::string& orgName, const std::string& orgProdNumber)
 {
-    std::string updateSql = Sql::Items::buildDynamicUpdateSql(item);
+    // if after updating both name and product number are empty dont make the update
+    std::string newName = updateItem.name ? *updateItem.name : orgName;
+    std::string newProductNumber = updateItem.productNumber ? *updateItem.productNumber : orgProdNumber;
+
+    if (newName.empty() && newProductNumber.empty()) {
+        return false;
+    }
+
+    std::string updateSql = Sql::Items::buildDynamicUpdateSql(updateItem);
 
     // if nothing to update ending update
     if (updateSql.empty()) {
@@ -82,8 +96,8 @@ bool DataBase::updateItem(const int& id, const ItemUpdate& item)
         return false;
     }
 
-    int indexForId = dynamicUpdateBinding(item, stmt);
-    sqlite3_bind_int(stmt, indexForId, id);
+    int indexForId = dynamicUpdateBinding(updateItem, stmt);
+    sqlite3_bind_int(stmt, indexForId, itemId);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Insert failed: " << sqlite3_errmsg(db) << std::endl;

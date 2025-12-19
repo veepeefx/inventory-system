@@ -41,10 +41,6 @@ private:
     void initEditor();
     void initControls();
 
-    void saveItem();
-    void cancel();
-    void loadItem();
-
 signals:
     void itemUpdated();
 

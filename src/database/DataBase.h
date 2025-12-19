@@ -14,7 +14,9 @@ public:
     ~DataBase();
 
     bool insertItem(const Item& item);
-    bool updateItem(const int& id, const ItemUpdate& item);
+    bool updateItem(const ItemUpdate& updateItem, const int& itemId,
+                    const std::string& orgName, const std::string& orgProdNumber);
+
     bool deleteItem(const int& itemId);
     std::vector<Item> getItems();
 

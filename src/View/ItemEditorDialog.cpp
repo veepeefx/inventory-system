@@ -199,7 +199,7 @@ void ItemEditorDialog::saveButtonClicked()
         newItem.description = descriptionTextEdit_->toPlainText().toStdString();
 
         if (!db_.insertItem(newItem)) {
-            // MAKE ERROR POP UP HERE AND ASK TO TRY AGAIN (NAME OR PRODUCT NUMBER REQUIRED)
+            // POP UP ALERT IF BOTH NAME AND PRODUCT NUMBER IS MISSING
             return;
         }
 
@@ -236,7 +236,11 @@ void ItemEditorDialog::saveButtonClicked()
             updateItem.description = descriptionTextEdit_->toPlainText().toStdString();
         }
 
-        db_.updateItem(loadedItem->id, updateItem);
+        if (!db_.updateItem(updateItem, loadedItem->id, loadedItem->name,
+                           loadedItem->productNumber)) {
+            // POP UP ALERT IF BOTH NAME AND PRODUCT NUMBER IS MISSING
+            return;
+        }
     }
 
     emit itemUpdated();

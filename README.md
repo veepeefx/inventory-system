@@ -1,4 +1,4 @@
-# Inventory system (C++/SQLite3)
+# Inventory system (C++ / Qt / SQLite3)
 
 ## Description
 Inventory management system using C++ and SQLite3 which allows user to keep track on current items
@@ -9,6 +9,7 @@ All libraries are included in the project, so **no external installation is requ
 - [SQLite3](https://sqlite.org/download.html) - SQL library (included as `sqlite3.c` and `sqlite3.h`)
 - C++ 20 compatible compiler
 - CMake 4.0 ->
+- Qt6
 
 ## License
 Licensed under MIT License.
