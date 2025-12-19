@@ -8,7 +8,8 @@
 #include <ostream>
 #include <string>
 
-#include "Item.h"
+#include "../Item.h"
+#include "SqlQueries.h"
 
 DataBase::DataBase(const std::string& filePath)
 {
@@ -20,7 +21,7 @@ DataBase::DataBase(const std::string& filePath)
         return;
     }
 
-    std::cout << "Opened database successfully." << std::endl;
+    std::cerr << "Opened database successfully." << std::endl;
     initTables();
 }
 
@@ -31,33 +32,14 @@ DataBase::~DataBase()
 
 void DataBase::initTables()
 {
-    const char* sqlCreateItems = R"(
-    CREATE TABLE IF NOT EXISTS items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        product_number TEXT,
-        quantity INTEGER DEFAULT 0,
-        ean TEXT,
-        self_location TEXT,
-        price_no_vat REAL DEFAULT 0.0,
-        vat REAL DEFAULT 0.0,
-        discount REAL DEFAULT 0.0,
-        description TEXT,
-        modified_at TEXT DEFAULT (datetime('now', 'localtime')),
-        created_at TEXT DEFAULT (datetime('now', 'localtime'))); )";
-
-    sqlite3_exec(db, sqlCreateItems, NULL, NULL, NULL);
+    sqlite3_exec(db, Sql::Items::CREATE_TABLE, nullptr, nullptr, nullptr);
 }
 
 bool DataBase::insertItem(const Item& item)
 {
-    const char* sqlInsert = R"(
-    INSERT INTO items (name, product_number, quantity, ean, self_location, price_no_vat,
-                       vat, discount, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?); )";
-
     sqlite3_stmt* stmt;
 
-    if (sqlite3_prepare_v2(db, sqlInsert, -1, &stmt, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, Sql::Items::INSERT, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Can't prepare statement." << std::endl;
         sqlite3_finalize(stmt);
         return false;
@@ -86,19 +68,16 @@ bool DataBase::insertItem(const Item& item)
 
 bool DataBase::updateItem(const int& id, const ItemUpdate& item)
 {
-    std::string sqlDynamicPart = dynamicUpdateSqlStr(item);
+    std::string updateSql = Sql::Items::buildDynamicUpdateSql(item);
 
     // if nothing to update ending update
-    if (sqlDynamicPart.empty()) {
+    if (updateSql.empty()) {
         std::cerr << "Nothing to update" << std::endl;
         return false;
     }
 
-    std::string sql = "UPDATE items SET " + sqlDynamicPart +
-                      ", modified_at = datetime('now', 'localtime') WHERE id = ?";
-
     sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, updateSql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Can't prepare statement." << std::endl;
         return false;
     }
@@ -118,10 +97,8 @@ bool DataBase::updateItem(const int& id, const ItemUpdate& item)
 
 bool DataBase::deleteItem(const int& itemId)
 {
-    const char* sqlRemove = "DELETE FROM items WHERE id = ?;";
-
     sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, sqlRemove, -1, &stmt, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, Sql::Items::REMOVE, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Can't prepare statement: " << sqlite3_errmsg(db) << std::endl;
         return false;
     }
@@ -133,7 +110,7 @@ bool DataBase::deleteItem(const int& itemId)
         return false;
     }
 
-    // checks that deletation is successful
+    // checks that deletion is successful
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Delete failed: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_finalize(stmt);
@@ -155,13 +132,9 @@ std::vector<Item> DataBase::getItems()
 {
     std::vector<Item> items;
 
-    const char* sql = "SELECT id, name, product_number, quantity, ean, self_location, "
-                      "price_no_vat, vat, discount, description, modified_at, created_at "
-                      "FROM items;";
-
     sqlite3_stmt *stmt;
 
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, Sql::Items::GET, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
         return {};
     }
@@ -188,30 +161,6 @@ std::vector<Item> DataBase::getItems()
 
     sqlite3_finalize(stmt);
     return items;
-}
-
-std::string DataBase::dynamicUpdateSqlStr(const ItemUpdate &item)
-{
-    std::string res;
-
-    auto addField = [&](const std::string& fieldName) {
-        if (!res.empty()) {
-            res += ", ";
-        }
-        res += fieldName + " = ?";
-    };
-
-    if (item.name) { addField("name"); }
-    if (item.productNumber) { addField("product_number"); }
-    if (item.quantity) { addField("quantity"); }
-    if (item.ean) { addField("ean"); }
-    if (item.selfLocation) { addField("self_location"); }
-    if (item.priceNoVat) { addField("price_no_vat"); }
-    if (item.vat) { addField("vat"); }
-    if (item.discount) { addField("discount"); }
-    if (item.description) {addField("description"); }
-
-    return res;
 }
 
 int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)

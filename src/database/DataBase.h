@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "sqlite3.h"
-#include "Item.h"
+#include "../Item.h"
 
 class DataBase {
 public:
@@ -22,9 +22,6 @@ private:
 
     sqlite3 *db = nullptr;
     void initTables();
-
-    // makes dynamically changing part of the sql query for updateItem function
-    std::string dynamicUpdateSqlStr(const ItemUpdate& item);
 
     // dynamically binds all updated changes
     // returns index for next bind (id)

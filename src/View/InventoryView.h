@@ -1,11 +1,10 @@
 #ifndef INVENTORY_SYSTEM_INVENTORYVIEW_H
 #define INVENTORY_SYSTEM_INVENTORYVIEW_H
 
-#include <QStackedWidget>
 #include <QTableView>
 
 #include "ItemTableModel.h"
-#include "../DataBase.h"
+#include "../database/DataBase.h"
 
 class InventoryView : public QWidget {
     Q_OBJECT

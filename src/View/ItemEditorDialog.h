@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QTextEdit>
 
-#include "../DataBase.h"
+#include "../database/DataBase.h"
 
 class ItemEditorDialog : public QDialog {
     Q_OBJECT

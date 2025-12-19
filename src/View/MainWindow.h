@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QStackedWidget>
 
-#include "../DataBase.h"
+#include "../database/DataBase.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
