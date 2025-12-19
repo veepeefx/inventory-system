@@ -16,8 +16,7 @@ public:
 
     ~ItemEditorDialog() override;
 
-    void newItem();
-    void openItem(Item* item);
+    void loadItem(Item* item = nullptr);
 
 private:
     DataBase* db_;

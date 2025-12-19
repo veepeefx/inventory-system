@@ -150,34 +150,31 @@ void ItemEditorDialog::initControls()
     mainLayout_->addLayout(buttonLayout);
 }
 
-void ItemEditorDialog::newItem()
-{
-
-}
-
-void ItemEditorDialog::openItem(Item* item)
+void ItemEditorDialog::loadItem(Item* item)
 {
     // setting loadedItem
     loadedItem = item;
 
-    idLineEdit_->setText(QString::number(item->id));
-    nameLineEdit_->setText(QString::fromStdString(item->name));
-    productNumberLineEdit_->setText(QString::fromStdString(item->productNumber));
-    quantityLineEdit_->setText(QString::number(item->quantity));
-    eanLineEdit_->setText(QString::fromStdString(item->ean));
-    selfLocationLineEdit_->setText(QString::fromStdString(item->selfLocation));
-    priceNoVatLineEdit_->setText(QString::number(item->priceNoVat));
-    vatLineEdit_->setText(QString::number(item->vat));
-    discountLineEdit_->setText(QString::number(item->discount));
-    descriptionTextEdit_->setText(QString::fromStdString(item->description));
+    if (loadedItem != nullptr) {
+        idLineEdit_->setText(QString::number(item->id));
+        nameLineEdit_->setText(QString::fromStdString(item->name));
+        productNumberLineEdit_->setText(QString::fromStdString(item->productNumber));
+        quantityLineEdit_->setText(QString::number(item->quantity));
+        eanLineEdit_->setText(QString::fromStdString(item->ean));
+        selfLocationLineEdit_->setText(QString::fromStdString(item->selfLocation));
+        priceNoVatLineEdit_->setText(QString::number(item->priceNoVat));
+        vatLineEdit_->setText(QString::number(item->vat));
+        discountLineEdit_->setText(QString::number(item->discount));
+        descriptionTextEdit_->setText(QString::fromStdString(item->description));
 
-    double price = item->priceNoVat * (1 + item->vat / 100);
-    priceLineEdit_->setText(QString::number(price));
+        double price = item->priceNoVat * (1 + item->vat / 100);
+        priceLineEdit_->setText(QString::number(price));
 
-    double discountedPrice = price * (1 - item->discount / 100);
-    discountedPriceLineEdit_->setText(QString::number(discountedPrice));
+        double discountedPrice = price * (1 - item->discount / 100);
+        discountedPriceLineEdit_->setText(QString::number(discountedPrice));
 
-    // last modified and creation date
+        // last modified and creation date
+    }
 }
 
 void ItemEditorDialog::saveButtonClicked()
@@ -197,11 +194,9 @@ void ItemEditorDialog::saveButtonClicked()
         newItem.description = descriptionTextEdit_->toPlainText().toStdString();
 
         if (!db_->insertItem(newItem)) {
-            // MAKE ERROR POP UP HERE
+            // MAKE ERROR POP UP HERE AND ASK TO TRY AGAIN (NAME OR PRODUCT NUMBER REQUIRED)
             return;
         }
-        // removing loaded item
-        loadedItem = nullptr;
 
     // updating item
     } else {

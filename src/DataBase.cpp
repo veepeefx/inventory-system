@@ -155,7 +155,7 @@ std::vector<Item> DataBase::getItems()
 {
     std::vector<Item> items;
 
-    const char* sql = "SELECT id, name, product_number, quantity, self_location, "
+    const char* sql = "SELECT id, name, product_number, quantity, ean, self_location, "
                       "price_no_vat, vat, discount, description FROM items;";
 
     sqlite3_stmt *stmt;
@@ -167,15 +167,18 @@ std::vector<Item> DataBase::getItems()
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         Item item;
-        item.id = sqlite3_column_int(stmt, 0);
-        item.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-        item.productNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-        item.quantity = sqlite3_column_int(stmt, 3);
-        item.selfLocation = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
-        item.priceNoVat = sqlite3_column_double(stmt, 5);
-        item.vat = sqlite3_column_double(stmt, 6);
-        item.discount = sqlite3_column_double(stmt, 7);
-        item.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 8));
+
+        int index = 0;
+        item.id = sqlite3_column_int(stmt, index++);
+        item.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.productNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.quantity = sqlite3_column_int(stmt, index++);
+        item.ean = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.selfLocation = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.priceNoVat = sqlite3_column_double(stmt, index++);
+        item.vat = sqlite3_column_double(stmt, index++);
+        item.discount = sqlite3_column_double(stmt, index++);
+        item.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
 
         items.push_back(item);
     }

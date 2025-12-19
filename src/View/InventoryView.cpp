@@ -35,9 +35,7 @@ void InventoryView::initInventoryControls()
     QPushButton* editButton = new QPushButton("Edit");
     QPushButton* backButton = new QPushButton("Back");
 
-    connect(addButton, &QPushButton::clicked, this, [this]() {
-        openItemEditor(nullptr);
-    });
+    connect(addButton, &QPushButton::clicked, this, [this]() { openItemEditor(); });
 
     connect(removeButton, &QPushButton::clicked, this, [this]() {
         QItemSelectionModel* selection = table_->selectionModel();
@@ -60,9 +58,7 @@ void InventoryView::initInventoryControls()
         }
     });
 
-    connect(backButton, &QPushButton::clicked, this, [this]() {
-        emit returnMainMenu();
-    });
+    connect(backButton, &QPushButton::clicked, this, [this]() { emit returnMainMenu(); });
 
     controlLayout->addWidget(addButton);
     controlLayout->addWidget(removeButton);
@@ -82,10 +78,8 @@ void InventoryView::openItemEditor(Item* item)
     ItemEditorDialog* dialog = new ItemEditorDialog(db_, this);
     connect(dialog, &ItemEditorDialog::itemUpdated, this, &InventoryView::updateInventoryView);
 
-    // open editor with items current info if item given
-    if (item != nullptr) {
-        dialog->openItem(item);
-    }
+    // load item to editor
+    dialog->loadItem(item);
 
     dialog->exec();
 }

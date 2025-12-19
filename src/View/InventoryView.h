@@ -30,8 +30,7 @@ signals:
 private slots:
 
     void updateInventoryView();
-
-    void openItemEditor(Item* item);
+    void openItemEditor(Item* item = nullptr);
 };
 
 
