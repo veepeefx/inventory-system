@@ -7,16 +7,20 @@
 
 #include "../database/DataBase.h"
 
+enum Views {
+    MAIN_MENU,
+    INVENTORY_ITEMS
+};
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(DataBase* db, QWidget *parent = nullptr);
+    explicit MainWindow(DataBase& db, QWidget *parent = nullptr);
 
     ~MainWindow() override;
 
 private:
-    DataBase* db_;
 
     QStackedWidget* viewStack_;
     QGridLayout *mainLayout_;

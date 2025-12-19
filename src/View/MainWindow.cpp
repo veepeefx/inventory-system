@@ -4,16 +4,15 @@
 
 #include "InventoryView.h"
 
-MainWindow::MainWindow(DataBase* db, QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(DataBase& db, QWidget *parent)
+: QMainWindow(parent)
 {
-    db_ = db;
-
     QWidget *central = new QWidget();
 
     viewStack_ = new QStackedWidget(this);
     viewStack_->addWidget(central);
 
-    InventoryView* itemInventory = new InventoryView(db_);
+    InventoryView* itemInventory = new InventoryView(db);
     viewStack_->addWidget(itemInventory);
 
     mainLayout_ = new QGridLayout(central);
@@ -55,7 +54,7 @@ void MainWindow::initMainMenu()
 
 void MainWindow::onItemsButtonClicked()
 {
-    viewStack_->setCurrentIndex(1);
+    viewStack_->setCurrentIndex(Views::INVENTORY_ITEMS);
 }
 
 void MainWindow::onItemTypeButtonClicked()
@@ -74,5 +73,5 @@ void MainWindow::onExitButtonClicked()
 
 void MainWindow::switchViewToMainMenu()
 {
-    viewStack_->setCurrentIndex(0);
+    viewStack_->setCurrentIndex(Views::MAIN_MENU);
 }

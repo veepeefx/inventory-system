@@ -24,7 +24,6 @@ public:
 
 private:
     std::vector<Item> items_;
-
 };
 
 

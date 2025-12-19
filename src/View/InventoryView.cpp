@@ -6,7 +6,7 @@
 #include "ItemEditorDialog.h"
 
 
-InventoryView::InventoryView(DataBase* db, QWidget *parent)
+InventoryView::InventoryView(DataBase& db, QWidget *parent)
 : QWidget(parent), db_(db)
 {
     table_ = new QTableView(this);
@@ -16,7 +16,7 @@ InventoryView::InventoryView(DataBase* db, QWidget *parent)
     table_->setSelectionMode(QAbstractItemView::SingleSelection);
     table_->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    model_->setData(db_->getItems());
+    model_->setData(db_.getItems());
     table_->setModel(model_);
 
     mainLayout_ = new QVBoxLayout(this);
@@ -65,10 +65,10 @@ int InventoryView::selectedRowIndex() const
 
 void InventoryView::updateInventoryView()
 {
-    model_->setData(db_->getItems());
+    model_->setData(db_.getItems());
 }
 
-void InventoryView::openItemEditor(Item* item)
+void InventoryView::openItemEditor(const Item* item)
 {
     ItemEditorDialog* dialog = new ItemEditorDialog(db_, this);
     connect(dialog, &ItemEditorDialog::itemUpdated, this, &InventoryView::updateInventoryView);
@@ -83,7 +83,7 @@ void InventoryView::removeButtonClicked()
     int row = selectedRowIndex();
 
     if (row >= 0) {
-        db_->deleteItem(model_->getItem(row)->id);
+        db_.deleteItem(model_->getItem(row)->id);
         updateInventoryView();
     }
 }

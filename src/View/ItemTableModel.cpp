@@ -41,11 +41,11 @@ QVariant ItemTableModel::data(const QModelIndex& index, int role) const
         case 5: return item.discount;
         case 6: return price;
         case 7: return item.selfLocation.data();
+        default: return "NaN";
     }
-    return {};
 }
 
-Item* ItemTableModel::getItem(const int& row)
+Item* ItemTableModel::getItem(const int &row)
 {
     return &items_.at(row);
 }
@@ -65,8 +65,7 @@ QVariant ItemTableModel::headerData(int section, Qt::Orientation orientation, in
         case 5: return "Discount (%)";
         case 6: return "Price (€)";
         case 7: return "Self Location";
+        default: return "NaN";
     }
-
-    return {};
 }
 

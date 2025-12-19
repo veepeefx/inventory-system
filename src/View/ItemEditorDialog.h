@@ -12,16 +12,16 @@ class ItemEditorDialog : public QDialog {
     Q_OBJECT
 
 public:
-    explicit ItemEditorDialog(DataBase* db, QWidget *parent = nullptr);
+    explicit ItemEditorDialog(DataBase& db, QWidget *parent = nullptr);
 
     ~ItemEditorDialog() override;
 
-    void loadItem(Item* item = nullptr);
+    void loadItem(const Item* item = nullptr);
 
 private:
-    DataBase* db_;
+    DataBase& db_;
     QVBoxLayout *mainLayout_;
-    Item* loadedItem = nullptr;
+    const Item *loadedItem = nullptr;
 
     QLineEdit* idLineEdit_;
     QLineEdit* productNumberLineEdit_;

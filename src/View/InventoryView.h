@@ -10,7 +10,7 @@ class InventoryView : public QWidget {
     Q_OBJECT
 
 public:
-    explicit InventoryView(DataBase* db, QWidget *parent = nullptr);
+    explicit InventoryView(DataBase& db, QWidget *parent = nullptr);
 
     ~InventoryView() override;
 
@@ -19,7 +19,7 @@ private:
 
     QTableView* table_;
     ItemTableModel* model_;
-    DataBase* db_;
+    DataBase& db_;
 
     void initInventoryControls();
     int selectedRowIndex() const;
@@ -30,7 +30,7 @@ signals:
 private slots:
 
     void updateInventoryView();
-    void openItemEditor(Item* item = nullptr);
+    void openItemEditor(const Item* item = nullptr);
 
     void removeButtonClicked();
     void editButtonClicked();

@@ -9,7 +9,8 @@
 #include "InventoryView.h"
 
 
-ItemEditorDialog::ItemEditorDialog(DataBase* db, QWidget *parent) : QDialog(parent), db_(db)
+ItemEditorDialog::ItemEditorDialog(DataBase& db, QWidget *parent)
+: QDialog(parent), db_(db)
 {
     mainLayout_ = new QVBoxLayout(this);
 
@@ -152,7 +153,7 @@ void ItemEditorDialog::initControls()
     mainLayout_->addLayout(buttonLayout);
 }
 
-void ItemEditorDialog::loadItem(Item* item)
+void ItemEditorDialog::loadItem(const Item* item)
 {
     // setting loadedItem
     loadedItem = item;
@@ -197,7 +198,7 @@ void ItemEditorDialog::saveButtonClicked()
         newItem.discount = discountLineEdit_->text().toDouble();
         newItem.description = descriptionTextEdit_->toPlainText().toStdString();
 
-        if (!db_->insertItem(newItem)) {
+        if (!db_.insertItem(newItem)) {
             // MAKE ERROR POP UP HERE AND ASK TO TRY AGAIN (NAME OR PRODUCT NUMBER REQUIRED)
             return;
         }
@@ -235,7 +236,7 @@ void ItemEditorDialog::saveButtonClicked()
             updateItem.description = descriptionTextEdit_->toPlainText().toStdString();
         }
 
-        db_->updateItem(loadedItem->id, updateItem);
+        db_.updateItem(loadedItem->id, updateItem);
     }
 
     emit itemUpdated();
