@@ -1,14 +1,12 @@
 #include "DataBase.h"
 
-#include <functional>
-
 #include "sqlite3.h"
 
 #include <iostream>
 #include <ostream>
 #include <string>
 
-#include "../Item.h"
+#include "../utils/Item.h"
 #include "SqlQueries.h"
 
 DataBase::DataBase(const std::string& filePath)
@@ -144,8 +142,6 @@ bool DataBase::deleteItem(const int& itemId)
 
 std::vector<Item> DataBase::getItems()
 {
-    std::vector<Item> items;
-
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, Sql::Items::GET, -1, &stmt, nullptr) != SQLITE_OK) {
@@ -153,29 +149,30 @@ std::vector<Item> DataBase::getItems()
         return {};
     }
 
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        Item item;
-
-        int index = 0;
-        item.id = sqlite3_column_int(stmt, index++);
-        item.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
-        item.productNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
-        item.quantity = sqlite3_column_int(stmt, index++);
-        item.ean = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
-        item.selfLocation = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
-        item.priceNoVat = sqlite3_column_double(stmt, index++);
-        item.vat = sqlite3_column_double(stmt, index++);
-        item.discount = sqlite3_column_double(stmt, index++);
-        item.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
-        item.modifiedAt = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
-        item.createdAt = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
-
-        items.push_back(item);
-    }
+    std::vector<Item> items = fillItemsToVector(stmt);
 
     sqlite3_finalize(stmt);
     return items;
 }
+
+std::vector<Item> DataBase::searchItems(const std::vector<std::string>& searches,
+                                        const std::vector<SearchMode>& modes,
+                                        const std::vector<SearchType>& types)
+{
+    std::string sql = Sql::Items::buildDynamicSearchSql(searches, modes, types);
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+        return {};
+    }
+
+    std::vector<Item> items = fillItemsToVector(stmt);
+
+    sqlite3_finalize(stmt);
+    return items;
+}
+
 
 int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)
 {
@@ -210,4 +207,31 @@ int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)
     }
 
     return index;
+}
+
+std::vector<Item> DataBase::fillItemsToVector(sqlite3_stmt* stmt)
+{
+    std::vector<Item> items;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        Item item;
+
+        int index = 0;
+        item.id = sqlite3_column_int(stmt, index++);
+        item.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.productNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.quantity = sqlite3_column_int(stmt, index++);
+        item.ean = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.selfLocation = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.priceNoVat = sqlite3_column_double(stmt, index++);
+        item.vat = sqlite3_column_double(stmt, index++);
+        item.discount = sqlite3_column_double(stmt, index++);
+        item.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.modifiedAt = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        item.createdAt = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+
+        items.push_back(item);
+    }
+
+    return items;
 }

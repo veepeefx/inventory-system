@@ -48,26 +48,26 @@ void InventoryView::initSearchBar()
     // multiple search bars add possibility to narrow down search
     QLineEdit* search1LineEdit = new QLineEdit();
     QLineEdit* search2LineEdit = new QLineEdit();
-    search1LineEdit_->setFixedWidth(200);
-    search2LineEdit_->setFixedWidth(200);
+    search1LineEdit->setFixedWidth(200);
+    search2LineEdit->setFixedWidth(200);
 
     QComboBox* search1Type = new QComboBox();
     QComboBox* search2Type = new QComboBox();
-    search1Type_->setFixedWidth(200);
-    search2Type_->setFixedWidth(200);
+    search1Type->setFixedWidth(200);
+    search2Type->setFixedWidth(200);
 
-    for (auto it = searchModeStrings.begin(); it != searchModeStrings.end(); it++) {
+    for (auto it = SearchModeLabels.begin(); it != SearchModeLabels.end(); it++) {
         // SearchMode enum -> int
         int key = static_cast<int>(it.key());
         QString text = it.value();
 
-        search1Type_->addItem(text, key);
-        search2Type_->addItem(text, key);
+        search1Type->addItem(text, key);
+        search2Type->addItem(text, key);
     }
 
     // ADD USER TO HAVE POSSIBILITY TO CUSTOMIZE DEFAULT SEARCH TYPE
-    search1Type_->setCurrentIndex(static_cast<int>(SearchMode::NAME));
-    search2Type_->setCurrentIndex(static_cast<int>(SearchMode::PRODUCT_NUMBER));
+    search1Type->setCurrentIndex(static_cast<int>(SearchMode::NAME));
+    search2Type->setCurrentIndex(static_cast<int>(SearchMode::PRODUCT_NUMBER));
 
     QPushButton* searchButton = new QPushButton("Search");
 
@@ -145,14 +145,29 @@ void InventoryView::makeSearch(QLineEdit* search1LineEdit, QLineEdit* search2Lin
     QString qStr1 = search1LineEdit->text();
     QString qStr2 = search2LineEdit->text();
 
+    // if searches are empty list starting items
     if (qStr1.isEmpty() && qStr2.isEmpty()) {
+        model_->setData(db_.getItems());
         return;
     }
 
-    SearchMode mode1 = static_cast<SearchMode>(search1Type->currentIndex());
-    SearchMode mode2 = static_cast<SearchMode>(search2Type->currentIndex());
+    std::vector<std::string> vStr;
+    std::vector<SearchMode> vMode;
+    std::vector<SearchType> vType;
 
-    // SEARCH
+    if (!qStr1.isEmpty()) {
+        vStr.push_back(qStr1.toStdString());
+        vMode.push_back(static_cast<SearchMode>(search1Type->currentIndex()));
+        vType.push_back(SearchType::CONTAINS);
+    }
+
+    if (!qStr2.isEmpty()) {
+        vStr.push_back(qStr2.toStdString());
+        vMode.push_back(static_cast<SearchMode>(search2Type->currentIndex()));
+        vType.push_back(SearchType::CONTAINS);
+    }
+
+    model_->setData(db_.searchItems(vStr, vMode, vType));
 }
 
 void InventoryView::updateInventoryView()

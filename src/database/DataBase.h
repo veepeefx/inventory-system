@@ -5,7 +5,8 @@
 #include <vector>
 
 #include "sqlite3.h"
-#include "../Item.h"
+#include "../utils/Item.h"
+#include "../utils/CommonEnums.h"
 
 class DataBase {
 public:
@@ -20,6 +21,10 @@ public:
     bool deleteItem(const int& itemId);
     std::vector<Item> getItems();
 
+    std::vector<Item> searchItems(const std::vector<std::string>& searches,
+                                  const std::vector<SearchMode>& modes,
+                                  const std::vector<SearchType>& types);
+
 private:
 
     sqlite3 *db = nullptr;
@@ -28,6 +33,8 @@ private:
     // dynamically binds all updated changes
     // returns index for next bind (id)
     int dynamicUpdateBinding(const ItemUpdate& item, sqlite3_stmt* stmt);
+
+    std::vector<Item> fillItemsToVector(sqlite3_stmt* stmt);
 
 };
 

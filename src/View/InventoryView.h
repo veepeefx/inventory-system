@@ -6,22 +6,8 @@
 
 #include "ItemTableModel.h"
 #include "../database/DataBase.h"
+#include "../utils/CommonEnums.h"
 
-enum class SearchMode {
-    NAME,
-    PRODUCT_NUMBER,
-    SELF_LOCATION,
-    EAN,
-    ID
-};
-
-static const QMap<SearchMode, QString> searchModeStrings {
-        { SearchMode::NAME, "Name" },
-        { SearchMode::PRODUCT_NUMBER, "Product Number" },
-        { SearchMode::SELF_LOCATION, "Self Location"},
-        { SearchMode::EAN, "EAN"},
-        { SearchMode::ID, "Unique ID"}
-};
 
 class InventoryView : public QWidget {
     Q_OBJECT
@@ -38,19 +24,12 @@ private:
     ItemTableModel* model_;
     DataBase& db_;
 
-    // search widgets
-    QLineEdit* search1LineEdit_;
-    QLineEdit* search2LineEdit_;
-    QComboBox* search1Type_;
-    QComboBox* search2Type_;
-
     void initSearchBar();
     void initInventoryControls();
     int selectedRowIndex() const;
 
     void makeSearch(QLineEdit* search1LineEdit, QLineEdit* search2LineEdit,
                 QComboBox* search1Type, QComboBox* search2Type);
-    void sqlSearch(std::string search, SearchMode mode);
 
 signals:
     void returnMainMenu();

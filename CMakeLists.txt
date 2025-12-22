@@ -11,7 +11,7 @@ add_executable(inventory-system src/main.cpp
         third-party/sqlite3.c
         src/database/DataBase.cpp
         src/database/DataBase.h
-        src/Item.h
+        src/utils/Item.h
         src/View/MainWindow.cpp
         src/View/MainWindow.h
         src/View/InventoryView.cpp
@@ -21,7 +21,8 @@ add_executable(inventory-system src/main.cpp
         src/View/ItemEditorDialog.cpp
         src/View/ItemEditorDialog.h
         src/database/SqlQueries.h
-        src/database/SqlQueries.cpp)
+        src/database/SqlQueries.cpp
+        src/utils/CommonEnums.h)
 
 include_directories(third-party)
 target_link_libraries(inventory-system PRIVATE Qt6::Widgets)

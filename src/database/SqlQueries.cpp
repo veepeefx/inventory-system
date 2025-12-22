@@ -1,5 +1,8 @@
 #include "SqlQueries.h"
-#include "../Item.h"
+
+#include <iostream>
+
+#include "../utils/Item.h"
 
 #include <string>
 
@@ -8,6 +11,12 @@ namespace {
     constexpr const char* ITEMS_UPDATE_FIRST = "UPDATE items SET ";
     constexpr const char* ITEMS_UPDATE_LAST = ", modified_at = datetime('now', 'localtime')"
                                               " WHERE id = ?";
+
+    constexpr const char* ITEMS_SEARCH = R"(
+    SELECT id, name, product_number, quantity, ean, self_location,
+        price_no_vat, vat, discount, description, modified_at, created_at
+    FROM items WHERE )";
+
 }
 
 namespace Sql {
@@ -39,7 +48,48 @@ namespace Sql {
             }
             return ITEMS_UPDATE_FIRST + res + ITEMS_UPDATE_LAST;
         }
+
+        std::string buildDynamicSearchSql(const std::vector<std::string> &searches,
+                                          const std::vector<SearchMode> &modes,
+                                          const std::vector<SearchType> &types)
+        {
+            std::string sql = "";
+
+            for (int i = 0; i < searches.size(); i++) {
+                if (i != 0) {
+                    sql += " AND ";
+                }
+
+                switch (modes[i]) {
+                    case SearchMode::NAME:
+                        sql += "name ";
+                        break;
+                    case SearchMode::PRODUCT_NUMBER:
+                        sql += "product_number ";
+                        break;
+                    case SearchMode::SELF_LOCATION:
+                        sql += "self_location ";
+                        break;
+                    case SearchMode::EAN:
+                        sql += "ean ";
+                        break;
+                    case SearchMode::ID:
+                        sql += "id ";
+                        break;
+                };
+
+                switch (types[i]) {
+                    case SearchType::STARTS_WITH:
+                        sql += "= '" + searches[i] + "'";
+                        break;
+                    case SearchType::CONTAINS:
+                        sql += "LIKE '%" + searches[i] + "%'";
+                        break;
+                };
+            }
+            sql += ";";
+            std::cerr << ITEMS_SEARCH + sql << std::endl;
+            return ITEMS_SEARCH + sql;
+        }
     }
-
-
 }

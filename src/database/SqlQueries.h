@@ -2,7 +2,11 @@
 #define INVENTORY_SYSTEM_SQLQUERIES_H
 
 #include <string>
-#include "../Item.h"
+#include <vector>
+
+#include "../utils/Item.h"
+#include "../utils/CommonEnums.h"
+
 
 namespace Sql::Items {
 
@@ -38,6 +42,9 @@ namespace Sql::Items {
     )";
 
     std::string buildDynamicUpdateSql(const ItemUpdate& item);
+    std::string buildDynamicSearchSql(const std::vector<std::string>& searches,
+                                  const std::vector<SearchMode>& modes,
+                                  const std::vector<SearchType>& types);
 
 }
 
