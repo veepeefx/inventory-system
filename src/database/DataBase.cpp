@@ -160,12 +160,20 @@ std::vector<Item> DataBase::searchItems(const std::vector<std::string>& searches
                                         const std::vector<SearchType>& types,
                                         const std::vector<bool>& vCaseSensitivity)
 {
-    std::string sql = Sql::Items::buildDynamicSearchSql(searches, modes, types, vCaseSensitivity);
+    std::vector<std::string> bindValues;
     sqlite3_stmt* stmt;
+
+    std::string sql = Sql::Items::buildDynamicSearchSql(searches, modes, types,
+                                                        vCaseSensitivity, bindValues);
 
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
         return {};
+    }
+
+    int index = 1;
+    for (const std::string& bind : bindValues) {
+        sqlite3_bind_text(stmt, index++, bind.c_str(), -1, SQLITE_TRANSIENT);
     }
 
     std::vector<Item> items = fillItemsToVector(stmt);

@@ -52,7 +52,8 @@ namespace Sql {
         std::string buildDynamicSearchSql(const std::vector<std::string> &searches,
                                           const std::vector<SearchMode> &modes,
                                           const std::vector<SearchType> &types,
-                                          const std::vector<bool> &vCaseSensitivity)
+                                          const std::vector<bool> &vCaseSensitivity,
+                                          std::vector<std::string>& outBindValues)
         {
             std::string sql = "";
 
@@ -62,55 +63,36 @@ namespace Sql {
                 }
 
                 switch (modes[i]) {
-                    case SearchMode::NAME:
-                        sql += "name ";
-                        break;
-                    case SearchMode::PRODUCT_NUMBER:
-                        sql += "product_number ";
-                        break;
-                    case SearchMode::SELF_LOCATION:
-                        sql += "self_location ";
-                        break;
-                    case SearchMode::EAN:
-                        sql += "ean ";
-                        break;
-                    case SearchMode::ID:
-                        sql += "id ";
-                        break;
+                    case SearchMode::NAME:              sql += "name ";             break;
+                    case SearchMode::PRODUCT_NUMBER:    sql += "product_number ";   break;
+                    case SearchMode::SELF_LOCATION:     sql += "self_location ";    break;
+                    case SearchMode::EAN:               sql += "ean ";              break;
+                    case SearchMode::ID:                sql += "id ";               break;
                 };
 
-                bool caseSensitive = vCaseSensitivity[i];
+                bool cs = vCaseSensitivity[i];
+                std::string pattern;
 
                 switch (types[i]) {
                     case SearchType::STARTS_WITH:
-                        if (caseSensitive) {
-                            sql += "GLOB '" + searches[i] + "*'";
-                        } else {
-                            sql += "LIKE '" + searches[i] + "%'";
-                        }
+                        sql += cs ? "GLOB ?" : "LIKE ?";
+                        pattern = searches[i] + (cs ? "*" : "%");
                         break;
                     case SearchType::ENDS_WITH:
-                        if (caseSensitive) {
-                            sql += "GLOB '*" + searches[i] + "'";
-                        } else {
-                            sql += "LIKE '%" + searches[i] + "'";
-                        }
+                        sql += cs ? "GLOB ?" : "LIKE ?";
+                        pattern = (cs ? "*" : "%") + searches[i];
                         break;
                     case SearchType::CONTAINS:
-                        if (caseSensitive) {
-                            sql += "GLOB '*" + searches[i] + "*'";
-                        } else {
-                            sql += "LIKE '%" + searches[i] + "%'";
-                        }
+                        sql += cs ? "GLOB ?" : "LIKE ?";
+                        pattern = (cs ? "*" : "%") + searches[i] + (cs ? "*" : "%");
                         break;
                     case SearchType::EQUALS:
-                        sql += "= '" + searches[i] + "'";
-
-                        if (caseSensitive) {
-                            sql += " COLLATE BINARY";
-                        }
+                        sql += "= ?";
+                        sql += cs ? " COLLATE BINARY" : " COLLATE NOCASE";
+                        pattern = searches[i];
                         break;
                 };
+                outBindValues.push_back(pattern);
             }
             sql += ";";
             std::cerr << ITEMS_SEARCH + sql << std::endl;
