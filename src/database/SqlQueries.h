@@ -43,8 +43,9 @@ namespace Sql::Items {
 
     std::string buildDynamicUpdateSql(const ItemUpdate& item);
     std::string buildDynamicSearchSql(const std::vector<std::string>& searches,
-                                  const std::vector<SearchMode>& modes,
-                                  const std::vector<SearchType>& types);
+                                      const std::vector<SearchMode>& modes,
+                                      const std::vector<SearchType>& types,
+                                      const std::vector<bool> &vCaseSensitivity);
 
 }
 

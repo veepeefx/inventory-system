@@ -51,7 +51,8 @@ namespace Sql {
 
         std::string buildDynamicSearchSql(const std::vector<std::string> &searches,
                                           const std::vector<SearchMode> &modes,
-                                          const std::vector<SearchType> &types)
+                                          const std::vector<SearchType> &types,
+                                          const std::vector<bool> &vCaseSensitivity)
         {
             std::string sql = "";
 
@@ -78,12 +79,36 @@ namespace Sql {
                         break;
                 };
 
+                bool caseSensitive = vCaseSensitivity[i];
+
                 switch (types[i]) {
                     case SearchType::STARTS_WITH:
-                        sql += "= '" + searches[i] + "'";
+                        if (caseSensitive) {
+                            sql += "GLOB '" + searches[i] + "*'";
+                        } else {
+                            sql += "LIKE '" + searches[i] + "%'";
+                        }
+                        break;
+                    case SearchType::ENDS_WITH:
+                        if (caseSensitive) {
+                            sql += "GLOB '*" + searches[i] + "'";
+                        } else {
+                            sql += "LIKE '%" + searches[i] + "'";
+                        }
                         break;
                     case SearchType::CONTAINS:
-                        sql += "LIKE '%" + searches[i] + "%'";
+                        if (caseSensitive) {
+                            sql += "GLOB '*" + searches[i] + "*'";
+                        } else {
+                            sql += "LIKE '%" + searches[i] + "%'";
+                        }
+                        break;
+                    case SearchType::EQUALS:
+                        sql += "= '" + searches[i] + "'";
+
+                        if (caseSensitive) {
+                            sql += " COLLATE BINARY";
+                        }
                         break;
                 };
             }

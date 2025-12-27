@@ -23,7 +23,8 @@ public:
 
     std::vector<Item> searchItems(const std::vector<std::string>& searches,
                                   const std::vector<SearchMode>& modes,
-                                  const std::vector<SearchType>& types);
+                                  const std::vector<SearchType>& types,
+                                  const std::vector<bool>& vCaseSensitivity);
 
 private:
 

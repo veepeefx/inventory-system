@@ -12,16 +12,25 @@ enum class SearchMode {
 };
 
 static const QMap<SearchMode, QString> SearchModeLabels {
-            { SearchMode::NAME, "Name" },
-            { SearchMode::PRODUCT_NUMBER, "Product Number" },
-            { SearchMode::SELF_LOCATION, "Self Location"},
-            { SearchMode::EAN, "EAN"},
-            { SearchMode::ID, "Unique ID"}
+    { SearchMode::NAME, "Name" },
+    { SearchMode::PRODUCT_NUMBER, "Product Number" },
+    { SearchMode::SELF_LOCATION, "Self Location"},
+    { SearchMode::EAN, "EAN"},
+    { SearchMode::ID, "Unique ID"}
 };
 
 enum class SearchType {
     STARTS_WITH,
-    CONTAINS
+    ENDS_WITH,
+    CONTAINS,
+    EQUALS
+};
+
+static const QMap<SearchType, QString> SearchTypeLabels {
+    { SearchType::STARTS_WITH, "Starts" },
+    { SearchType::ENDS_WITH, "Ends" },
+    { SearchType::CONTAINS, "Contains" },
+    { SearchType::EQUALS, "Equals" }
 };
 
 

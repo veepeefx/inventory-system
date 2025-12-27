@@ -157,9 +157,10 @@ std::vector<Item> DataBase::getItems()
 
 std::vector<Item> DataBase::searchItems(const std::vector<std::string>& searches,
                                         const std::vector<SearchMode>& modes,
-                                        const std::vector<SearchType>& types)
+                                        const std::vector<SearchType>& types,
+                                        const std::vector<bool>& vCaseSensitivity)
 {
-    std::string sql = Sql::Items::buildDynamicSearchSql(searches, modes, types);
+    std::string sql = Sql::Items::buildDynamicSearchSql(searches, modes, types, vCaseSensitivity);
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
