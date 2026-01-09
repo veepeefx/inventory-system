@@ -6,8 +6,6 @@
 #include <QLabel>
 #include <QLineEdit>
 
-#include "InventoryView.h"
-
 
 ItemEditorDialog::ItemEditorDialog(DataBase& db, QWidget *parent)
 : QDialog(parent), db_(db)

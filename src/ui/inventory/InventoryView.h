@@ -8,8 +8,7 @@
 #include <QTableView>
 
 #include "ItemTableModel.h"
-#include "../database/DataBase.h"
-#include "../utils/CommonEnums.h"
+#include "../../database/DataBase.h"
 
 struct Search {
     QLabel* label = nullptr;

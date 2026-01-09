@@ -4,7 +4,7 @@
 #include <QAbstractTableModel>
 #include <QWidget>
 #include <QVBoxLayout>
-#include "../utils/Item.h"
+#include "../../utils/Item.h"
 
 class ItemTableModel : public QAbstractTableModel {
     Q_OBJECT

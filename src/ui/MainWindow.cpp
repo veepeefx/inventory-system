@@ -2,7 +2,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
-#include "InventoryView.h"
+#include "inventory/InventoryView.h"
 
 MainWindow::MainWindow(DataBase& db, QWidget *parent)
 : QMainWindow(parent)
