@@ -15,6 +15,11 @@ or educational purposes.
 - Item types to group items
 - Settings to modify presets
 
+## Disclaimer
+This software is provided as open source and “as is”, without any guarantees regarding data safety,
+compatibility, or future support. The developer is not responsible for any data loss, corruption,
+or unintended changes to data stored using this system.
+
 ## Installation / Build
 1. Clone this repo
    ```
