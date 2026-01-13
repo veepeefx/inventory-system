@@ -13,7 +13,7 @@ namespace {
                                               " WHERE id = ?";
 
     constexpr const char* ITEMS_SEARCH = R"(
-    SELECT id, name, product_number, quantity, ean, self_location,
+    SELECT id, item_type_id, name, product_number, quantity, ean, self_location,
         price_no_vat, vat, discount, description, modified_at, created_at
     FROM items WHERE )";
 
@@ -34,6 +34,7 @@ namespace Sql {
             };
 
             if (item.name) { addField("name"); }
+            if (item.itemTypeId) { addField("item_type_id"); }
             if (item.productNumber) { addField("product_number"); }
             if (item.quantity) { addField("quantity"); }
             if (item.ean) { addField("ean"); }

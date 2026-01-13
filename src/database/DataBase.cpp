@@ -30,7 +30,12 @@ DataBase::~DataBase()
 
 void DataBase::initTables()
 {
+    // item types
+    sqlite3_exec(db, Sql::ItemTypes::CREATE_TABLE, nullptr, nullptr, nullptr);
+
+    // items
     sqlite3_exec(db, Sql::Items::CREATE_TABLE, nullptr, nullptr, nullptr);
+    sqlite3_exec(db, Sql::Items::CREATE_INDEX_ITEM_TYPE_ID, nullptr, nullptr, nullptr);
 }
 
 bool DataBase::insertItem(const Item& item)
@@ -50,6 +55,7 @@ bool DataBase::insertItem(const Item& item)
 
     int index = 1;
     sqlite3_bind_text(stmt, index++, item.name.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, index++, item.itemTypeId);
     sqlite3_bind_text(stmt, index++, item.productNumber.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, index++, item.quantity);
     sqlite3_bind_text(stmt, index++, item.ean.c_str(), -1, SQLITE_TRANSIENT);
@@ -190,6 +196,9 @@ int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)
     if (item.name) {
         sqlite3_bind_text(stmt, index++, item.name->c_str(), -1, SQLITE_TRANSIENT);
     }
+    if (item.itemTypeId) {
+        sqlite3_bind_int(stmt, index++, item.itemTypeId.value());
+    }
     if (item.productNumber) {
         sqlite3_bind_text(stmt, index++, item.productNumber->c_str(), -1, SQLITE_TRANSIENT);
     }
@@ -227,6 +236,7 @@ std::vector<Item> DataBase::fillItemsToVector(sqlite3_stmt* stmt)
 
         int index = 0;
         item.id = sqlite3_column_int(stmt, index++);
+        item.itemTypeId = sqlite3_column_int(stmt, index++);
         item.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
         item.productNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
         item.quantity = sqlite3_column_int(stmt, index++);

@@ -5,6 +5,7 @@
 
 struct Item {
     int id = 0;
+    int itemTypeId;
     std::string name;
     std::string productNumber;
     int quantity = 0;
@@ -20,6 +21,7 @@ struct Item {
 
 // used for updating existing item
 struct ItemUpdate {
+    std::optional<int> itemTypeId;
     std::optional<std::string> name;
     std::optional<std::string> productNumber;
     std::optional<int> quantity;
