@@ -6,7 +6,8 @@
 #include <QComboBox>
 #include <QCheckBox>
 
-#include "ItemEditorDialog.h"
+#include "editors/ItemEditor.h"
+#include "editors/ItemTypeEditor.h"
 #include "tablemodels/ItemTypeTableModel.h"
 
 
@@ -126,7 +127,7 @@ void InventoryView::initInventoryControls()
     QPushButton* editButton = new QPushButton("Edit");
     QPushButton* backButton = new QPushButton("Back");
 
-    connect(addButton, &QPushButton::clicked, this, [this]() { openItemEditor(); });
+    connect(addButton, &QPushButton::clicked, this, [this]() { openEditor(); });
     connect(removeButton, &QPushButton::clicked, this, &InventoryView::removeButtonClicked);
     connect(editButton, &QPushButton::clicked, this, &InventoryView::editButtonClicked);
     connect(backButton, &QPushButton::clicked, this, [this]() { emit returnMainMenu(); });
@@ -188,14 +189,19 @@ void InventoryView::updateInventoryView()
     model_->loadData();
 }
 
-void InventoryView::openItemEditor(const Item* item)
+void InventoryView::openEditor(int row)
 {
-    ItemEditorDialog* dialog = new ItemEditorDialog(db_, this);
-    connect(dialog, &ItemEditorDialog::itemUpdated, this, &InventoryView::updateInventoryView);
+    BasicEditor* editor;
+    switch (mode_) {
+        case InventoryMode::ITEM:
+            editor = new ItemEditor(db_, this);
+            break;
+        case InventoryMode::ITEM_TYPE:  editor = new ItemTypeEditor(db_, this);      break;
+        default: return;
+    }
 
-    // load item to editor
-    dialog->loadItem(item);
-    dialog->exec();
+    connect(editor, &BasicEditor::itemUpdated, this, &InventoryView::updateInventoryView);
+    editor->exec();
 }
 
 void InventoryView::removeButtonClicked()
@@ -213,9 +219,5 @@ void InventoryView::removeButtonClicked()
 void InventoryView::editButtonClicked()
 {
     int row = selectedRowIndex();
-
-    // ISN'T IMPLEMENTED FOR ITEMTYPE YET
-    if (ItemTableModel* itemModel = dynamic_cast<ItemTableModel*>(model_)) {
-        openItemEditor(itemModel->getItem(row));
-    }
+    openEditor();
 }

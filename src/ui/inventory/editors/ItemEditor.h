@@ -1,26 +1,24 @@
 #ifndef INVENTORY_SYSTEM_ITEMEDITORDIALOG_H
 #define INVENTORY_SYSTEM_ITEMEDITORDIALOG_H
 
-#include <QDialog>
 #include <QLineEdit>
-#include <QVBoxLayout>
 #include <QTextEdit>
 
-#include "../../database/DataBase.h"
+#include "BasicEditor.h"
+#include "../../../database/DataBase.h"
 
-class ItemEditorDialog : public QDialog {
+class ItemEditor : public BasicEditor {
     Q_OBJECT
 
 public:
-    explicit ItemEditorDialog(DataBase& db, QWidget *parent = nullptr);
+    explicit ItemEditor(DataBase& db, QWidget *parent = nullptr);
 
-    ~ItemEditorDialog() override;
+    ~ItemEditor() override;
 
     void loadItem(const Item* item = nullptr);
+    void open();
 
 private:
-    DataBase& db_;
-    QVBoxLayout *mainLayout_;
     const Item *loadedItem = nullptr;
 
     QLineEdit* idLineEdit_;
@@ -39,14 +37,9 @@ private:
     QLineEdit* createdLineEdit_;
 
     void initEditor();
-    void initControls();
-
-signals:
-    void itemUpdated();
 
 private slots:
-
-    void saveButtonClicked();
+    void save();
 };
 
 

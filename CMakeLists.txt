@@ -18,8 +18,8 @@ add_executable(inventory-system src/main.cpp
         src/ui/inventory/InventoryView.h
         src/ui/inventory/tablemodels/ItemTableModel.cpp
         src/ui/inventory/tablemodels/ItemTableModel.h
-        src/ui/inventory/ItemEditorDialog.cpp
-        src/ui/inventory/ItemEditorDialog.h
+        src/ui/inventory/editors/ItemEditor.cpp
+        src/ui/inventory/editors/ItemEditor.h
         src/database/SqlQueries.h
         src/database/SqlQueries.cpp
         src/utils/CommonEnums.h
@@ -28,7 +28,11 @@ add_executable(inventory-system src/main.cpp
         src/ui/inventory/tablemodels/ItemTypeTableModel.cpp
         src/ui/inventory/tablemodels/ItemTypeTableModel.h
         src/utils/ItemType.h
-        src/ui/inventory/tablemodels/BasicTableModel.h)
+        src/ui/inventory/tablemodels/BasicTableModel.h
+        src/ui/inventory/editors/ItemTypeEditor.cpp
+        src/ui/inventory/editors/ItemTypeEditor.h
+        src/ui/inventory/editors/BasicEditor.cpp
+        src/ui/inventory/editors/BasicEditor.h)
 
 include_directories(third-party)
 target_link_libraries(inventory-system PRIVATE Qt6::Widgets)

@@ -1,4 +1,4 @@
-#include "ItemEditorDialog.h"
+#include "ItemEditor.h"
 
 #include <iostream>
 #include <QPushButton>
@@ -7,99 +7,66 @@
 #include <QLineEdit>
 
 
-ItemEditorDialog::ItemEditorDialog(DataBase& db, QWidget *parent)
-: QDialog(parent), db_(db)
+ItemEditor::ItemEditor(DataBase& db, QWidget *parent)
+: BasicEditor(db, parent)
 {
-    mainLayout_ = new QVBoxLayout(this);
-
     initEditor();
     initControls();
+    connect(this, &BasicEditor::saveData, this, &ItemEditor::save);
 
     setWindowTitle("Item Editor");
-    resize(800,500);
 }
 
-ItemEditorDialog::~ItemEditorDialog() {}
+ItemEditor::~ItemEditor() {}
 
-void ItemEditorDialog::initEditor()
+void ItemEditor::initEditor()
 {
-    QGridLayout *editorLayout = new QGridLayout();
+    QGridLayout *layout = new QGridLayout();
     int row = 0;
 
-    auto addField = [this, editorLayout, &row]
-    (const QString& labelText, bool nextRow = true, int col = 0, int colSpan = 1) {
-        QLabel* label = new QLabel(labelText, this);
-        QLineEdit* lineEdit = new QLineEdit(this);
-        editorLayout->addWidget(label, row, col);
-        editorLayout->addWidget(lineEdit, row, col + 1, 1, colSpan);
-        if (nextRow) { row++; }
-        return lineEdit;
-    };
-
-    auto addSpacer = [this, editorLayout, &row] () {
-        QLabel* label = new QLabel("", this);
-        editorLayout->addWidget(label, row, 0);
-        row++;
-    };
-
-    idLineEdit_ = addField("ID:");
+    idLineEdit_ = newLineEdit(*layout, "ID:", row++);
     idLineEdit_->setDisabled(true);     // id cant be changed
 
-    productNumberLineEdit_ = addField("Product Number:", false);
-    eanLineEdit_ = addField("Ean:", true, 2);
+    productNumberLineEdit_ = newLineEdit(*layout, "Product Number:", row);
+    eanLineEdit_ = newLineEdit(*layout, "Ean:", row++, 2);
 
-    nameLineEdit_ = addField("Name:", true, 0, 3);
+    nameLineEdit_ = newLineEdit(*layout, "Name:", row++, 0, 3);
 
-    addSpacer();
+    layout->addWidget(new QLabel(""), row++, 0);
 
-    priceLineEdit_ = addField("Price:", false);
-    priceNoVatLineEdit_ = addField("Price (excl. VAT):", false, 2);
-    vatLineEdit_ = addField("VAT:", true, 4);
+    priceLineEdit_ = newLineEdit(*layout, "Price:", row);
+    priceNoVatLineEdit_ = newLineEdit(*layout, "Price (excl. VAT):", row, 2);
+    vatLineEdit_ = newLineEdit(*layout, "VAT:", row++, 4);
 
-    discountedPriceLineEdit_ = addField("Discounted Price:", false);
-    discountLineEdit_ = addField("Discount:", true, 2);
+    discountedPriceLineEdit_ = newLineEdit(*layout, "Discounted Price:", row);
+    discountLineEdit_ = newLineEdit(*layout, "Discount:", row++, 2);
 
-    addSpacer();
+    layout->addWidget(new QLabel(""), row++, 0);
 
-    quantityLineEdit_ = addField("Quantity:");
+    quantityLineEdit_ = newLineEdit(*layout, "Quantity:", row++);
 
-    selfLocationLineEdit_ = addField("Self location:");
+    selfLocationLineEdit_ = newLineEdit(*layout, "Self location:", row++);
 
-    addSpacer();
+    layout->addWidget(new QLabel(""), row++, 0);
 
     QLabel* descriptionLabel = new QLabel("Description:", this);
     descriptionTextEdit_ = new QTextEdit(this);
-    editorLayout->addWidget(descriptionLabel, row, 0, 1, 1);
-    editorLayout->addWidget(descriptionTextEdit_, row, 1, 3, 3);
+    layout->addWidget(descriptionLabel, row, 0, 1, 1);
+    layout->addWidget(descriptionTextEdit_, row, 1, 3, 3);
 
     row += 4;
 
-    lastModifiedLineEdit_ = addField("Last Modified:", false);
+    lastModifiedLineEdit_ = newLineEdit(*layout, "Last Modified:", row);
     lastModifiedLineEdit_->setDisabled(true);   // updates automatically
-    createdLineEdit_ = addField("Created At:", true, 2);
+    createdLineEdit_ = newLineEdit(*layout, "Created At:", row++, 2);
     createdLineEdit_->setDisabled(true);        // updates automatically
 
-    addSpacer();
+    layout->addWidget(new QLabel(""), row, 0);
 
-    mainLayout_->addLayout(editorLayout);
+    mainLayout_->addLayout(layout);
 }
 
-void ItemEditorDialog::initControls()
-{
-    QPushButton* cancelButton = new QPushButton("Cancel", this);
-    QPushButton* saveButton = new QPushButton("Save", this);
-
-    connect(cancelButton, &QPushButton::clicked, this, &ItemEditorDialog::reject);
-    connect(saveButton, &QPushButton::clicked, this, &ItemEditorDialog::saveButtonClicked);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->addWidget(cancelButton);
-    buttonLayout->addWidget(saveButton);
-
-    mainLayout_->addLayout(buttonLayout);
-}
-
-void ItemEditorDialog::loadItem(const Item* item)
+void ItemEditor::loadItem(const Item* item)
 {
     // setting loadedItem
     loadedItem = item;
@@ -128,7 +95,7 @@ void ItemEditorDialog::loadItem(const Item* item)
     }
 }
 
-void ItemEditorDialog::saveButtonClicked()
+void ItemEditor::save()
 {
     // new item
     if (loadedItem == nullptr) {

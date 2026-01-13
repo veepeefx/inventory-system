@@ -57,7 +57,8 @@ signals:
 private slots:
 
     void updateInventoryView();
-    void openItemEditor(const Item* item = nullptr);
+    void openEditor(int row = -1);
+    //void openItemEditor(const Item* item = nullptr);
 
     void removeButtonClicked();
     void editButtonClicked();
