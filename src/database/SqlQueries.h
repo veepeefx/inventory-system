@@ -80,8 +80,12 @@ namespace Sql::ItemTypes {
     constexpr const char* REMOVE = "DELETE FROM item_types WHERE id = ?;";
 
     constexpr const char* GET = R"(
-    SELECT id, name, type_number, description, modified_at, created_at
-    FROM item_types;
+    SELECT t.id, t.name, t.type_number, t.description, t.modified_at, t.created_at,
+        COALESCE(SUM(i.quantity), 0) AS total_quantity
+    FROM item_types t
+    LEFT JOIN items i
+        ON i.item_type_id = t.id
+    GROUP BY t.id;
     )";
 
 }
