@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <sstream>
 #include <string>
 
 #include "../utils/Item.h"
@@ -38,7 +39,7 @@ void DataBase::initTables()
     sqlite3_exec(db, Sql::Items::CREATE_INDEX_ITEM_TYPE_ID, nullptr, nullptr, nullptr);
 }
 
-bool DataBase::insertItem(const Item& item)
+bool DataBase::insert(const Item& item)
 {
     // must have name or product number in order to add
     if (item.name.empty() && item.productNumber.empty()) {
@@ -72,6 +73,100 @@ bool DataBase::insertItem(const Item& item)
     }
 
     sqlite3_finalize(stmt);
+    return true;
+}
+
+bool DataBase::insert(const ItemType& itemType)
+{
+    // must have name or type number in order to add
+    if (itemType.name.empty() && itemType.typeNumber.empty()) {
+        return false;
+    }
+
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, Sql::ItemTypes::INSERT, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Can't prepare statement." << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    int index = 1;
+    sqlite3_bind_text(stmt, index++, itemType.name.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, index++, itemType.typeNumber.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, index++, itemType.selfLocation.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, index++, itemType.description.c_str(), -1, SQLITE_TRANSIENT);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Insert failed: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
+    return true;
+}
+
+bool DataBase::remove(const Item& item)
+{
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, Sql::Items::REMOVE, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Can't prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return false;
+    }
+
+    // checks that id is valid
+    if (sqlite3_bind_int(stmt, 1, item.id) != SQLITE_OK) {
+        std::cerr << "Failed to bind id: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    // checks that deletion is successful
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Delete failed: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    int deletedRows = sqlite3_changes(db);
+    sqlite3_finalize(stmt);
+
+    // checks that in the list had item with itemId
+    if (deletedRows == 0) {
+        return false;
+    }
+
+    return true;
+}
+
+bool DataBase::remove(const ItemType& itemType)
+{
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, Sql::ItemTypes::REMOVE, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Can't prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return false;
+    }
+
+    if (sqlite3_bind_int(stmt, 1, itemType.id) != SQLITE_OK) {
+        std::cerr << "Failed to bind id: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Delete failed: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    int deletedRows = sqlite3_changes(db);
+    sqlite3_finalize(stmt);
+
+    if (deletedRows == 0) {
+        return false;
+    }
+
     return true;
 }
 
@@ -113,39 +208,6 @@ bool DataBase::updateItem(const ItemUpdate& updateItem, const int& itemId,
     return true;
 }
 
-bool DataBase::deleteItem(const int& itemId)
-{
-    sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, Sql::Items::REMOVE, -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Can't prepare statement: " << sqlite3_errmsg(db) << std::endl;
-        return false;
-    }
-
-    // checks that id is valid
-    if (sqlite3_bind_int(stmt, 1, itemId) != SQLITE_OK) {
-        std::cerr << "Failed to bind id: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(stmt);
-        return false;
-    }
-
-    // checks that deletion is successful
-    if (sqlite3_step(stmt) != SQLITE_DONE) {
-        std::cerr << "Delete failed: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(stmt);
-        return false;
-    }
-
-    int deletedRows = sqlite3_changes(db);
-    sqlite3_finalize(stmt);
-
-    // checks that in the list had item with itemId
-    if (deletedRows == 0) {
-        return false;
-    }
-
-    return true;
-}
-
 std::vector<Item> DataBase::getItems()
 {
     sqlite3_stmt *stmt;
@@ -159,6 +221,21 @@ std::vector<Item> DataBase::getItems()
 
     sqlite3_finalize(stmt);
     return items;
+}
+
+std::vector<ItemType> DataBase::getItemTypes()
+{
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, Sql::Items::GET, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+        return {};
+    }
+
+    std::vector<ItemType> itemTypes = fillItemTypesToVector(stmt);
+
+    sqlite3_finalize(stmt);
+    return itemTypes;
 }
 
 std::vector<Item> DataBase::searchItems(const std::vector<std::string>& searches,
@@ -253,4 +330,35 @@ std::vector<Item> DataBase::fillItemsToVector(sqlite3_stmt* stmt)
     }
 
     return items;
+}
+
+std::vector<ItemType> DataBase::fillItemTypesToVector(sqlite3_stmt* stmt)
+{
+    std::vector<ItemType> itemTypes;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        ItemType type;
+
+        int index = 0;
+        type.id = sqlite3_column_int(stmt, index++);
+        type.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        type.typeNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        type.selfLocation = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        type.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        type.modifiedAt = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        type.createdAt = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        type.totalQuantity = sqlite3_column_int(stmt, index++);
+
+        // split ids and push to items vector
+        const char* itemIdsCSV = reinterpret_cast<const char*>(sqlite3_column_text(stmt, index++));
+        if(itemIdsCSV) {
+            std::stringstream ss(itemIdsCSV);
+            std::string token;
+            while(std::getline(ss, token, ',')) {
+                type.items.push_back(std::stoi(token));
+            }
+        }
+        itemTypes.push_back(type);
+    }
+    return itemTypes;
 }

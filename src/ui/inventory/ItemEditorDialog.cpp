@@ -144,7 +144,7 @@ void ItemEditorDialog::saveButtonClicked()
         newItem.discount = discountLineEdit_->text().toDouble();
         newItem.description = descriptionTextEdit_->toPlainText().toStdString();
 
-        if (!db_.insertItem(newItem)) {
+        if (!db_.insert(newItem)) {
             // POP UP ALERT IF BOTH NAME AND PRODUCT NUMBER IS MISSING
             return;
         }

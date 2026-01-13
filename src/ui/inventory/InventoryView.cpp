@@ -197,7 +197,7 @@ void InventoryView::removeButtonClicked()
     int row = selectedRowIndex();
 
     if (row >= 0) {
-        db_.deleteItem(model_->getItem(row)->id);
+        db_.remove(*model_->getItem(row));
         updateInventoryView();
     }
 }

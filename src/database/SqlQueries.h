@@ -66,6 +66,7 @@ namespace Sql::ItemTypes {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         type_number TEXT,
+        self_location TEXT,
         description TEXT,
         modified_at TEXT DEFAULT (datetime('now', 'localtime')),
         created_at TEXT DEFAULT (datetime('now', 'localtime')));
@@ -73,15 +74,16 @@ namespace Sql::ItemTypes {
 
     constexpr const char* INSERT = R"(
     INSERT INTO item_types (
-        id, name, type_number, description, modified_at, created_at)
+        id, name, type_number, self_location, description, modified_at, created_at)
     VALUES (?, ?, ?, ?, ?, ?);
     )";
 
     constexpr const char* REMOVE = "DELETE FROM item_types WHERE id = ?;";
 
     constexpr const char* GET = R"(
-    SELECT t.id, t.name, t.type_number, t.description, t.modified_at, t.created_at,
-        COALESCE(SUM(i.quantity), 0) AS total_quantity
+    SELECT t.id, t.name, t.type_number, t.self_location, t.description, t.modified_at, t.created_at,
+        COALESCE(SUM(i.quantity), 0) AS total_quantity,
+        GROUP_CONCAT(i.id) AS item_ids
     FROM item_types t
     LEFT JOIN items i
         ON i.item_type_id = t.id
