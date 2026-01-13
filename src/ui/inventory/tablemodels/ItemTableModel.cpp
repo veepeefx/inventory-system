@@ -1,16 +1,35 @@
 #include "ItemTableModel.h"
 
-ItemTableModel::ItemTableModel(QWidget *parent)
-    : QAbstractTableModel(parent) {}
+#include "../../../database/DataBase.h"
+
+ItemTableModel::ItemTableModel(DataBase& db, QWidget *parent)
+    : BasicTableModel(db, parent) {}
 
 ItemTableModel::~ItemTableModel() {}
 
-void ItemTableModel::setData(const std::vector<Item>& items)
+void ItemTableModel::loadData()
 {
     beginResetModel();
-    items_ = items;
+    items_ = db_.getItems();
     endResetModel();
 }
+
+void ItemTableModel::loadData(const Search& search)
+{
+    beginResetModel();
+    items_ = db_.searchItems(search);
+    endResetModel();
+}
+
+int ItemTableModel::getId(int row)
+{
+    if (row < 0 || row >= items_.size()) {
+        return -1;
+    }
+
+    return items_.at(row).id;
+}
+
 
 int ItemTableModel::rowCount(const QModelIndex&) const
 {

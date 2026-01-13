@@ -107,16 +107,23 @@ bool DataBase::insert(const ItemType& itemType)
     return true;
 }
 
-bool DataBase::remove(const Item& item)
+bool DataBase::remove(int id, InventoryMode mode)
 {
+    const char* sql;
+    switch (mode) {
+        case InventoryMode::ITEM:       sql = Sql::Items::REMOVE;       break;
+        case InventoryMode::ITEM_TYPE:  sql = Sql::ItemTypes::REMOVE;   break;
+        default: return false;
+    }
+
     sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, Sql::Items::REMOVE, -1, &stmt, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Can't prepare statement: " << sqlite3_errmsg(db) << std::endl;
         return false;
     }
 
     // checks that id is valid
-    if (sqlite3_bind_int(stmt, 1, item.id) != SQLITE_OK) {
+    if (sqlite3_bind_int(stmt, 1, id) != SQLITE_OK) {
         std::cerr << "Failed to bind id: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_finalize(stmt);
         return false;
@@ -140,35 +147,6 @@ bool DataBase::remove(const Item& item)
     return true;
 }
 
-bool DataBase::remove(const ItemType& itemType)
-{
-    sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, Sql::ItemTypes::REMOVE, -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Can't prepare statement: " << sqlite3_errmsg(db) << std::endl;
-        return false;
-    }
-
-    if (sqlite3_bind_int(stmt, 1, itemType.id) != SQLITE_OK) {
-        std::cerr << "Failed to bind id: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(stmt);
-        return false;
-    }
-
-    if (sqlite3_step(stmt) != SQLITE_DONE) {
-        std::cerr << "Delete failed: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(stmt);
-        return false;
-    }
-
-    int deletedRows = sqlite3_changes(db);
-    sqlite3_finalize(stmt);
-
-    if (deletedRows == 0) {
-        return false;
-    }
-
-    return true;
-}
 
 bool DataBase::updateItem(const ItemUpdate& updateItem, const int& itemId,
                           const std::string& orgName, const std::string& orgProdNumber)
@@ -227,7 +205,7 @@ std::vector<ItemType> DataBase::getItemTypes()
 {
     sqlite3_stmt *stmt;
 
-    if (sqlite3_prepare_v2(db, Sql::Items::GET, -1, &stmt, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, Sql::ItemTypes::GET, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
         return {};
     }
@@ -238,16 +216,12 @@ std::vector<ItemType> DataBase::getItemTypes()
     return itemTypes;
 }
 
-std::vector<Item> DataBase::searchItems(const std::vector<std::string>& searches,
-                                        const std::vector<SearchMode>& modes,
-                                        const std::vector<SearchType>& types,
-                                        const std::vector<bool>& vCaseSensitivity)
+std::vector<Item> DataBase::searchItems(const Search& search)
 {
     std::vector<std::string> bindValues;
     sqlite3_stmt* stmt;
 
-    std::string sql = Sql::Items::buildDynamicSearchSql(searches, modes, types,
-                                                        vCaseSensitivity, bindValues);
+    std::string sql = Sql::Items::buildDynamicSearchSql(search, bindValues);
 
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;

@@ -9,7 +9,8 @@
 
 enum Views {
     MAIN_MENU,
-    INVENTORY_ITEMS
+    INVENTORY_ITEMS,
+    INVENTORY_ITEM_TYPES
 };
 
 class MainWindow : public QMainWindow {

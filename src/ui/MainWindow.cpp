@@ -12,8 +12,11 @@ MainWindow::MainWindow(DataBase& db, QWidget *parent)
     viewStack_ = new QStackedWidget(this);
     viewStack_->addWidget(central);
 
-    InventoryView* itemInventory = new InventoryView(db);
+    InventoryView* itemInventory = new InventoryView(db, InventoryMode::ITEM);
     viewStack_->addWidget(itemInventory);
+
+    InventoryView* itemTypeInventory = new InventoryView(db, InventoryMode::ITEM_TYPE);
+    viewStack_->addWidget(itemTypeInventory);
 
     mainLayout_ = new QGridLayout(central);
 
@@ -21,6 +24,7 @@ MainWindow::MainWindow(DataBase& db, QWidget *parent)
 
     // return feature for InventoryView
     connect(itemInventory, &InventoryView::returnMainMenu, this, &MainWindow::switchViewToMainMenu);
+    connect(itemTypeInventory, &InventoryView::returnMainMenu, this, &MainWindow::switchViewToMainMenu);
 
     setCentralWidget(viewStack_);
     setWindowTitle("Inventory System");
@@ -59,11 +63,11 @@ void MainWindow::onItemsButtonClicked()
 
 void MainWindow::onItemTypeButtonClicked()
 {
+    viewStack_->setCurrentIndex(Views::INVENTORY_ITEM_TYPES);
 }
 
 void MainWindow::onSettingsButtonClicked()
 {
-
 }
 
 void MainWindow::onExitButtonClicked()

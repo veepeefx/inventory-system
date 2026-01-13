@@ -50,20 +50,17 @@ namespace Sql {
             return ITEMS_UPDATE_FIRST + res + ITEMS_UPDATE_LAST;
         }
 
-        std::string buildDynamicSearchSql(const std::vector<std::string> &searches,
-                                          const std::vector<SearchMode> &modes,
-                                          const std::vector<SearchType> &types,
-                                          const std::vector<bool> &vCaseSensitivity,
+        std::string buildDynamicSearchSql(const Search& search,
                                           std::vector<std::string>& outBindValues)
         {
             std::string sql = "";
 
-            for (int i = 0; i < searches.size(); i++) {
+            for (int i = 0; i < search.terms.size(); i++) {
                 if (i != 0) {
                     sql += " AND ";
                 }
 
-                switch (modes[i]) {
+                switch (search.modes[i]) {
                     case SearchMode::NAME:              sql += "name ";             break;
                     case SearchMode::PRODUCT_NUMBER:    sql += "product_number ";   break;
                     case SearchMode::SELF_LOCATION:     sql += "self_location ";    break;
@@ -71,26 +68,26 @@ namespace Sql {
                     case SearchMode::ID:                sql += "id ";               break;
                 };
 
-                bool cs = vCaseSensitivity[i];
+                bool cs = search.caseSensitivity[i];
                 std::string pattern;
 
-                switch (types[i]) {
+                switch (search.types[i]) {
                     case SearchType::STARTS_WITH:
                         sql += cs ? "GLOB ?" : "LIKE ?";
-                        pattern = searches[i] + (cs ? "*" : "%");
+                        pattern = search.terms[i] + (cs ? "*" : "%");
                         break;
                     case SearchType::ENDS_WITH:
                         sql += cs ? "GLOB ?" : "LIKE ?";
-                        pattern = (cs ? "*" : "%") + searches[i];
+                        pattern = (cs ? "*" : "%") + search.terms[i];
                         break;
                     case SearchType::CONTAINS:
                         sql += cs ? "GLOB ?" : "LIKE ?";
-                        pattern = (cs ? "*" : "%") + searches[i] + (cs ? "*" : "%");
+                        pattern = (cs ? "*" : "%") + search.terms[i] + (cs ? "*" : "%");
                         break;
                     case SearchType::EQUALS:
                         sql += "= ?";
                         sql += cs ? " COLLATE BINARY" : " COLLATE NOCASE";
-                        pattern = searches[i];
+                        pattern = search.terms[i];
                         break;
                 };
                 outBindValues.push_back(pattern);

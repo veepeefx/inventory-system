@@ -4,16 +4,20 @@
 #include <QAbstractTableModel>
 #include <QWidget>
 #include <QVBoxLayout>
-#include "../../utils/Item.h"
 
-class ItemTableModel : public QAbstractTableModel {
+#include "BasicTableModel.h"
+#include "../../../utils/Item.h"
+
+class ItemTableModel : public BasicTableModel {
     Q_OBJECT
 
 public:
-    explicit ItemTableModel(QWidget *parent = nullptr);
+    explicit ItemTableModel(DataBase& db, QWidget *parent = nullptr);
     ~ItemTableModel() override;
 
-    void setData(const std::vector<Item>& items);
+    void loadData() override;
+    void loadData(const Search& search) override;
+    int getId(int row) override;
 
     int rowCount(const QModelIndex&) const override;
     int columnCount(const QModelIndex&) const override;

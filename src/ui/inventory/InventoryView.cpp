@@ -7,20 +7,31 @@
 #include <QCheckBox>
 
 #include "ItemEditorDialog.h"
+#include "tablemodels/ItemTypeTableModel.h"
 
 
-InventoryView::InventoryView(DataBase& db, QWidget *parent)
-: QWidget(parent), db_(db)
+InventoryView::InventoryView(DataBase& db, InventoryMode mode, QWidget *parent)
+: QWidget(parent), db_(db), mode_(mode)
 {
     table_ = new QTableView(this);
-    model_ = new ItemTableModel(this);
+
+    switch (mode) {
+        case InventoryMode::ITEM:
+            model_ = new ItemTableModel(db, this);
+            break;
+        case InventoryMode::ITEM_TYPE:
+            model_ = new ItemTypeTableModel(db, this);
+            break;
+        default:
+            return;
+    }
+
+    model_->loadData();
+    table_->setModel(model_);
 
     table_->setSelectionBehavior(QAbstractItemView::SelectRows);
     table_->setSelectionMode(QAbstractItemView::SingleSelection);
     table_->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
-    model_->setData(db_.getItems());
-    table_->setModel(model_);
 
     mainLayout_ = new QVBoxLayout(this);
 
@@ -43,9 +54,9 @@ void InventoryView::initSearchBar()
     QLabel* searchLabel = new QLabel("Search:");
     searchLabel->setStyleSheet("font-size: 12pt; font-weight: bold;");
 
-    std::vector<Search> searches;
+    std::vector<SearchWidgets> searches;
     for (int i = 0; i < SEARCH_PARAMETER_COUNT; i++) {
-        Search search;
+        SearchWidgets search;
         search.label = new QLabel("Parameter " + QString::number(i + 1) + ":", this);
         search.lineEdit = new QLineEdit(this);
         search.modeBox = new QComboBox(this);
@@ -61,7 +72,7 @@ void InventoryView::initSearchBar()
         int key = static_cast<int>(it.key());
         QString text = it.value();
 
-        for (const Search& s : searches) {
+        for (const SearchWidgets& s : searches) {
             s.modeBox->addItem(text, key);
         }
     }
@@ -70,7 +81,7 @@ void InventoryView::initSearchBar()
         int key = static_cast<int>(it.key());
         QString text = it.value();
 
-        for (const Search& s : searches) {
+        for (const SearchWidgets& s : searches) {
             s.typeBox->addItem(text, key);
         }
     }
@@ -87,7 +98,7 @@ void InventoryView::initSearchBar()
 
     row++;
 
-    for (const Search& s : searches) {
+    for (const SearchWidgets& s : searches) {
         searchLayout->addWidget(s.label, row, 0, 1, 1);
         searchLayout->addWidget(s.typeBox, row, 1, 1, 1);
         searchLayout->addWidget(s.lineEdit, row, 2, 1, 1);
@@ -143,12 +154,12 @@ int InventoryView::selectedRowIndex() const
     return row;
 }
 
-void InventoryView::makeSearch(const std::vector<Search>& searches)
+void InventoryView::makeSearch(const std::vector<SearchWidgets>& searches)
 {
     // check if all search bars are empty don't make search rather just show items from id 0->
     bool allEmpty = true;
 
-    for (const Search& s : searches) {
+    for (const SearchWidgets& s : searches) {
         if (!s.lineEdit->text().trimmed().isEmpty()) {
             allEmpty = false;
             break;
@@ -156,30 +167,25 @@ void InventoryView::makeSearch(const std::vector<Search>& searches)
     }
 
     if (allEmpty) {
-        model_->setData(db_.getItems());
+        model_->loadData();
         return;
     }
 
-    std::vector<std::string> vStr;
-    std::vector<SearchMode> vMode;
-    std::vector<SearchType> vType;
-    std::vector<bool> vCaseSensitivity;
-
-    for (const Search& s : searches) {
+    Search search;
+    for (const SearchWidgets& s : searches) {
         if (!s.lineEdit->text().isEmpty()) {
-            vStr.push_back(s.lineEdit->text().toStdString());
-            vMode.push_back(static_cast<SearchMode>(s.modeBox->currentIndex()));
-            vType.push_back(static_cast<SearchType>(s.typeBox->currentIndex()));
-            vCaseSensitivity.push_back(s.caseSensitivityBox->isChecked());
+            search.terms.push_back(s.lineEdit->text().toStdString());
+            search.modes.push_back(static_cast<SearchMode>(s.modeBox->currentIndex()));
+            search.types.push_back(static_cast<SearchType>(s.typeBox->currentIndex()));
+            search.caseSensitivity.push_back(s.caseSensitivityBox->isChecked());
         }
     }
-
-    model_->setData(db_.searchItems(vStr, vMode, vType, vCaseSensitivity));
+    model_->loadData(search);
 }
 
 void InventoryView::updateInventoryView()
 {
-    model_->setData(db_.getItems());
+    model_->loadData();
 }
 
 void InventoryView::openItemEditor(const Item* item)
@@ -195,9 +201,11 @@ void InventoryView::openItemEditor(const Item* item)
 void InventoryView::removeButtonClicked()
 {
     int row = selectedRowIndex();
+    int id = model_->getId(row);
 
-    if (row >= 0) {
-        db_.remove(*model_->getItem(row));
+    // removes id if row valid (-1 incase of error)
+    if (id >= 0) {
+        db_.remove(id, mode_);
         updateInventoryView();
     }
 }
@@ -206,7 +214,8 @@ void InventoryView::editButtonClicked()
 {
     int row = selectedRowIndex();
 
-    if (row >= 0) {
-        openItemEditor(model_->getItem(row));
+    // ISN'T IMPLEMENTED FOR ITEMTYPE YET
+    if (ItemTableModel* itemModel = dynamic_cast<ItemTableModel*>(model_)) {
+        openItemEditor(itemModel->getItem(row));
     }
 }

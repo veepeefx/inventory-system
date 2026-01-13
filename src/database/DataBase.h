@@ -19,8 +19,7 @@ public:
     bool insert(const Item& item);
     bool insert(const ItemType& itemType);
 
-    bool remove(const Item& item);
-    bool remove(const ItemType& itemType);
+    bool remove(int id, InventoryMode mode);
 
     bool updateItem(const ItemUpdate& updateItem, const int& itemId,
                     const std::string& orgName, const std::string& orgProdNumber);
@@ -28,10 +27,7 @@ public:
     std::vector<Item> getItems();
     std::vector<ItemType> getItemTypes();
 
-    std::vector<Item> searchItems(const std::vector<std::string>& searches,
-                                  const std::vector<SearchMode>& modes,
-                                  const std::vector<SearchType>& types,
-                                  const std::vector<bool>& vCaseSensitivity);
+    std::vector<Item> searchItems(const Search& search);
 
 
 private:

@@ -7,10 +7,10 @@
 #include <QLineEdit>
 #include <QTableView>
 
-#include "ItemTableModel.h"
+#include "tablemodels/ItemTableModel.h"
 #include "../../database/DataBase.h"
 
-struct Search {
+struct SearchWidgets {
     QLabel* label = nullptr;
     QLineEdit* lineEdit = nullptr;
     QComboBox* modeBox = nullptr;
@@ -29,7 +29,7 @@ class InventoryView : public QWidget {
     Q_OBJECT
 
 public:
-    explicit InventoryView(DataBase& db, QWidget *parent = nullptr);
+    explicit InventoryView(DataBase& db, InventoryMode mode, QWidget *parent = nullptr);
 
     ~InventoryView() override;
 
@@ -40,15 +40,16 @@ private:
 
     QVBoxLayout *mainLayout_;
 
-    QTableView* table_;
-    ItemTableModel* model_;
+    QTableView* table_ = nullptr;
+    BasicTableModel* model_ = nullptr;
     DataBase& db_;
+    InventoryMode mode_;
 
     void initSearchBar();
     void initInventoryControls();
     int selectedRowIndex() const;
 
-    void makeSearch(const std::vector<Search>& searches);
+    void makeSearch(const std::vector<SearchWidgets>& searches);
 
 signals:
     void returnMainMenu();

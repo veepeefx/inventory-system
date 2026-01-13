@@ -33,5 +33,17 @@ static const QMap<SearchType, QString> SearchTypeLabels {
     { SearchType::EQUALS, "Equals" }
 };
 
+struct Search {
+    std::vector<std::string> terms;
+    std::vector<SearchMode> modes;
+    std::vector<SearchType> types;
+    std::vector<bool> caseSensitivity;
+};
+
+// INVENTORY STATES
+enum class InventoryMode {
+    ITEM,
+    ITEM_TYPE
+};
 
 #endif //INVENTORY_SYSTEM_COMMONENUMS_H

@@ -1,18 +1,35 @@
 #include "ItemTypeTableModel.h"
 
-#include "../../database/DataBase.h"
+#include "../../../database/DataBase.h"
 
 
-ItemTypeTableModel::ItemTypeTableModel(QWidget *parent)
-    : QAbstractTableModel(parent) {}
+ItemTypeTableModel::ItemTypeTableModel(DataBase& db, QWidget *parent)
+    : BasicTableModel(db, parent) {}
 
 ItemTypeTableModel::~ItemTypeTableModel() {}
 
-void ItemTypeTableModel::setData(const std::vector<ItemType>& itemTypes)
+void ItemTypeTableModel::loadData()
 {
     beginResetModel();
-    itemTypes_ = itemTypes;
+    itemTypes_ = db_.getItemTypes();
     endResetModel();
+}
+
+void ItemTypeTableModel::loadData(const Search& search)
+{
+    beginResetModel();
+    // NO SEARCH FUNCTIONALITY FOR ITEM TYPES YET
+    itemTypes_ = db_.getItemTypes();
+    endResetModel();
+}
+
+int ItemTypeTableModel::getId(int row)
+{
+    if (row < 0 || row >= itemTypes_.size()) {
+        return -1;
+    }
+
+    return itemTypes_.at(row).id;
 }
 
 int ItemTypeTableModel::rowCount(const QModelIndex&) const
@@ -42,7 +59,7 @@ QVariant ItemTypeTableModel::data(const QModelIndex& index, int role) const
     }
 }
 
-ItemType* ItemTypeTableModel::getItem(const int &row)
+ItemType* ItemTypeTableModel::getType(const int &row)
 {
     return &itemTypes_.at(row);
 }
