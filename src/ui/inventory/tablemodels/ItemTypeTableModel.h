@@ -19,14 +19,12 @@ public:
     void loadData() override;
     void loadData(const Search& search) override;
     int getId(int row) override;
-
+    ItemType* getItemType(const int& row);
 
     int rowCount(const QModelIndex&) const override;
     int columnCount(const QModelIndex&) const override;
     QVariant data(const QModelIndex& index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-    ItemType* getType(const int& row);
 
 private:
     std::vector<ItemType> itemTypes_;

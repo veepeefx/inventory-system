@@ -191,17 +191,20 @@ void InventoryView::updateInventoryView()
 
 void InventoryView::openEditor(int row)
 {
-    BasicEditor* editor;
-    switch (mode_) {
-        case InventoryMode::ITEM:
-            editor = new ItemEditor(db_, this);
-            break;
-        case InventoryMode::ITEM_TYPE:  editor = new ItemTypeEditor(db_, this);      break;
-        default: return;
-    }
+    if (ItemTableModel* itemModel = dynamic_cast<ItemTableModel*>(model_)) {
+        ItemEditor* editor = new ItemEditor(db_, this);
+        editor->openItem(itemModel->getItem(row));
 
-    connect(editor, &BasicEditor::itemUpdated, this, &InventoryView::updateInventoryView);
-    editor->exec();
+        connect(editor, &BasicEditor::itemUpdated, this, &InventoryView::updateInventoryView);
+        editor->exec();
+
+    } else if (ItemTypeTableModel* itemTypeModel = dynamic_cast<ItemTypeTableModel*>(model_)) {
+        ItemTypeEditor* editor = new ItemTypeEditor(db_, this);
+        editor->openItemType(itemTypeModel->getItemType(row));
+
+        connect(editor, &BasicEditor::itemUpdated, this, &InventoryView::updateInventoryView);
+        editor->exec();
+    }
 }
 
 void InventoryView::removeButtonClicked()
@@ -219,5 +222,5 @@ void InventoryView::removeButtonClicked()
 void InventoryView::editButtonClicked()
 {
     int row = selectedRowIndex();
-    openEditor();
+    openEditor(row);
 }

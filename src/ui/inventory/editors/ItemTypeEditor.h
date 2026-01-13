@@ -9,16 +9,14 @@ class ItemTypeEditor : public BasicEditor {
 
 public:
     ItemTypeEditor(DataBase& db, QWidget* parent = nullptr);
-
     ~ItemTypeEditor();
 
-    void loadItemType(const ItemType* type = nullptr);
+    void openItemType(const ItemType* type = nullptr);
 
 private:
+    const ItemType* loadedItemType = nullptr;
+
     void initEditor();
-
-
-private slots:
 
 };
 

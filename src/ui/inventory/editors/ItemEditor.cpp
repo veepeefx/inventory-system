@@ -66,33 +66,32 @@ void ItemEditor::initEditor()
     mainLayout_->addLayout(layout);
 }
 
-void ItemEditor::loadItem(const Item* item)
+void ItemEditor::openItem(const Item* item)
 {
-    // setting loadedItem
     loadedItem = item;
+    if (loadedItem == nullptr) { return; }
 
-    if (loadedItem != nullptr) {
-        idLineEdit_->setText(QString::number(item->id));
-        nameLineEdit_->setText(QString::fromStdString(item->name));
-        productNumberLineEdit_->setText(QString::fromStdString(item->productNumber));
-        quantityLineEdit_->setText(QString::number(item->quantity));
-        eanLineEdit_->setText(QString::fromStdString(item->ean));
-        selfLocationLineEdit_->setText(QString::fromStdString(item->selfLocation));
-        priceNoVatLineEdit_->setText(QString::number(item->priceNoVat));
-        vatLineEdit_->setText(QString::number(item->vat));
-        discountLineEdit_->setText(QString::number(item->discount));
-        descriptionTextEdit_->setText(QString::fromStdString(item->description));
+    // update all lineEdits in editor to correspond loaded item
+    idLineEdit_->setText(QString::number(item->id));
+    nameLineEdit_->setText(QString::fromStdString(item->name));
+    productNumberLineEdit_->setText(QString::fromStdString(item->productNumber));
+    quantityLineEdit_->setText(QString::number(item->quantity));
+    eanLineEdit_->setText(QString::fromStdString(item->ean));
+    selfLocationLineEdit_->setText(QString::fromStdString(item->selfLocation));
+    priceNoVatLineEdit_->setText(QString::number(item->priceNoVat));
+    vatLineEdit_->setText(QString::number(item->vat));
+    discountLineEdit_->setText(QString::number(item->discount));
+    descriptionTextEdit_->setText(QString::fromStdString(item->description));
 
-        double price = item->priceNoVat * (1 + item->vat / 100);
-        priceLineEdit_->setText(QString::number(price));
+    double price = item->priceNoVat * (1 + item->vat / 100);
+    priceLineEdit_->setText(QString::number(price));
 
-        double discountedPrice = price * (1 - item->discount / 100);
-        discountedPriceLineEdit_->setText(QString::number(discountedPrice));
+    double discountedPrice = price * (1 - item->discount / 100);
+    discountedPriceLineEdit_->setText(QString::number(discountedPrice));
 
-        // last modified and creation date
-        lastModifiedLineEdit_->setText(QString::fromStdString(item->modifiedAt));
-        createdLineEdit_->setText(QString::fromStdString(item->createdAt));
-    }
+    // last modified and creation date
+    lastModifiedLineEdit_->setText(QString::fromStdString(item->modifiedAt));
+    createdLineEdit_->setText(QString::fromStdString(item->createdAt));
 }
 
 void ItemEditor::save()

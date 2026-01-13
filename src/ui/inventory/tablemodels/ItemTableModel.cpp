@@ -30,6 +30,14 @@ int ItemTableModel::getId(int row)
     return items_.at(row).id;
 }
 
+Item* ItemTableModel::getItem(const int &row)
+{
+    if (row < 0 || row >= items_.size()) {
+        return nullptr;
+    }
+
+    return &items_.at(row);
+}
 
 int ItemTableModel::rowCount(const QModelIndex&) const
 {
@@ -62,11 +70,6 @@ QVariant ItemTableModel::data(const QModelIndex& index, int role) const
         case 7: return item.selfLocation.data();
         default: return "NaN";
     }
-}
-
-Item* ItemTableModel::getItem(const int &row)
-{
-    return &items_.at(row);
 }
 
 QVariant ItemTableModel::headerData(int section, Qt::Orientation orientation, int role) const

@@ -13,11 +13,12 @@ ItemTypeEditor::ItemTypeEditor(DataBase& db, QWidget* parent)
 ItemTypeEditor::~ItemTypeEditor()
 {}
 
-void ItemTypeEditor::loadItemType(const ItemType *type)
+void ItemTypeEditor::openItemType(const ItemType* type)
 {
-    if (type != nullptr) {
+    loadedItemType = type;
+    if (type == nullptr) { return; }
 
-    }
+
 }
 
 void ItemTypeEditor::initEditor()

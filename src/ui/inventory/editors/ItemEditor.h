@@ -12,11 +12,9 @@ class ItemEditor : public BasicEditor {
 
 public:
     explicit ItemEditor(DataBase& db, QWidget *parent = nullptr);
-
     ~ItemEditor() override;
 
-    void loadItem(const Item* item = nullptr);
-    void open();
+    void openItem(const Item* item = nullptr);
 
 private:
     const Item *loadedItem = nullptr;

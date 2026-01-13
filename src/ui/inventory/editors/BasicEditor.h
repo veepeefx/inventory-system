@@ -11,7 +11,7 @@ class BasicEditor : public QDialog {
     Q_OBJECT
 
 public:
-    BasicEditor(DataBase& db, QWidget *parent = nullptr);
+    explicit BasicEditor(DataBase& db, QWidget *parent = nullptr);
 
     ~BasicEditor();
 

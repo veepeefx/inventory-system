@@ -32,6 +32,15 @@ int ItemTypeTableModel::getId(int row)
     return itemTypes_.at(row).id;
 }
 
+ItemType* ItemTypeTableModel::getItemType(const int &row)
+{
+    if (row < 0 || row >= itemTypes_.size()) {
+        return nullptr;
+    }
+
+    return &itemTypes_.at(row);
+}
+
 int ItemTypeTableModel::rowCount(const QModelIndex&) const
 {
     return itemTypes_.size();
@@ -57,11 +66,6 @@ QVariant ItemTypeTableModel::data(const QModelIndex& index, int role) const
         case 3: return itemType.selfLocation.data();
         default: return "NaN";
     }
-}
-
-ItemType* ItemTypeTableModel::getType(const int &row)
-{
-    return &itemTypes_.at(row);
 }
 
 QVariant ItemTypeTableModel::headerData(int section, Qt::Orientation orientation, int role) const
