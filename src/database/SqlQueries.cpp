@@ -6,17 +6,21 @@
 
 #include <string>
 
+#include "../utils/ItemType.h"
+
 namespace {
 
     constexpr const char* ITEMS_UPDATE_FIRST = "UPDATE items SET ";
-    constexpr const char* ITEMS_UPDATE_LAST = ", modified_at = datetime('now', 'localtime')"
-                                              " WHERE id = ?";
-
     constexpr const char* ITEMS_SEARCH = R"(
     SELECT id, item_type_id, name, product_number, quantity, ean, self_location,
         price_no_vat, vat, discount, description, modified_at, created_at
     FROM items WHERE )";
 
+    constexpr const char* ITEM_TYPES_UPDATE_FIRST = "UPDATE item_types SET ";
+
+    // common
+    constexpr const char* UPDATE_LAST = ", modified_at = datetime('now', 'localtime')"
+                                        " WHERE id = ?";
 }
 
 namespace Sql {
@@ -47,7 +51,7 @@ namespace Sql {
             if (res.empty()) {
                 return "";
             }
-            return ITEMS_UPDATE_FIRST + res + ITEMS_UPDATE_LAST;
+            return ITEMS_UPDATE_FIRST + res + UPDATE_LAST;
         }
 
         std::string buildDynamicSearchSql(const Search& search,
@@ -95,6 +99,30 @@ namespace Sql {
             sql += ";";
             std::cerr << ITEMS_SEARCH + sql << std::endl;
             return ITEMS_SEARCH + sql;
+        }
+    }
+
+    namespace ItemTypes {
+
+        std::string buildDynamicUpdateSql(const ItemTypeUpdate& type)
+        {
+            std::string res;
+            auto addField = [&](const std::string& fieldName) {
+                if (!res.empty()) {
+                    res += ", ";
+                }
+                res += fieldName + " = ?";
+            };
+
+            if (type.name) { addField("name"); }
+            if (type.typeNumber) { addField("type_number"); }
+            if (type.selfLocation) { addField("self_location"); }
+            if (type.description) { addField("description"); }
+
+            if (res.empty()) {
+                return "";
+            }
+            return ITEM_TYPES_UPDATE_FIRST + res + UPDATE_LAST;
         }
     }
 }

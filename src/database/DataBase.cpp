@@ -148,8 +148,8 @@ bool DataBase::remove(int id, InventoryMode mode)
 }
 
 
-bool DataBase::updateItem(const ItemUpdate& updateItem, const int& itemId,
-                          const std::string& orgName, const std::string& orgProdNumber)
+bool DataBase::update(const ItemUpdate& updateItem, int itemId,
+                      const std::string& orgName, const std::string& orgProdNumber)
 {
     // if after updating both name and product number are empty dont make the update
     std::string newName = updateItem.name ? *updateItem.name : orgName;
@@ -174,6 +174,44 @@ bool DataBase::updateItem(const ItemUpdate& updateItem, const int& itemId,
     }
 
     int indexForId = dynamicUpdateBinding(updateItem, stmt);
+    sqlite3_bind_int(stmt, indexForId, itemId);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Insert failed: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
+    return true;
+}
+
+
+bool DataBase::update(const ItemTypeUpdate& updateType, int itemId,
+                      const std::string& orgName, const std::string& orgTypeNumber)
+{
+    std::string newName = updateType.name ? *updateType.name : orgName;
+    std::string newProductNumber = updateType.typeNumber ? *updateType.typeNumber : orgTypeNumber;
+
+    if (newName.empty() && newProductNumber.empty()) {
+        return false;
+    }
+
+    std::string updateSql = Sql::ItemTypes::buildDynamicUpdateSql(updateType);
+
+    // if nothing to update ending update
+    if (updateSql.empty()) {
+        std::cerr << "Nothing to update" << std::endl;
+        return false;
+    }
+
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, updateSql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Can't prepare statement." << std::endl;
+        return false;
+    }
+
+    int indexForId = dynamicUpdateBinding(updateType, stmt);
     sqlite3_bind_int(stmt, indexForId, itemId);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
@@ -273,6 +311,26 @@ int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)
     }
     if (item.description) {
         sqlite3_bind_text(stmt, index++, item.description->c_str(), -1, SQLITE_TRANSIENT);
+    }
+
+    return index;
+}
+
+int DataBase::dynamicUpdateBinding(const ItemTypeUpdate& type, sqlite3_stmt* stmt)
+{
+    int index = 1;
+
+    if (type.name) {
+        sqlite3_bind_text(stmt, index++, type.name->c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (type.typeNumber) {
+        sqlite3_bind_text(stmt, index++, type.typeNumber->c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (type.selfLocation) {
+        sqlite3_bind_text(stmt, index++, type.selfLocation->c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (type.description) {
+        sqlite3_bind_text(stmt, index++, type.description->c_str(), -1, SQLITE_TRANSIENT);
     }
 
     return index;

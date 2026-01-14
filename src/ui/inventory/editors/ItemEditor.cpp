@@ -149,7 +149,7 @@ void ItemEditor::save()
             updateItem.description = descriptionTextEdit_->toPlainText().toStdString();
         }
 
-        if (!db_.updateItem(updateItem, loadedItem_->id, loadedItem_->name,
+        if (!db_.update(updateItem, loadedItem_->id, loadedItem_->name,
                            loadedItem_->productNumber)) {
             // POP UP ALERT IF BOTH NAME AND PRODUCT NUMBER IS MISSING
             return;

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../utils/Item.h"
+#include "../utils/ItemType.h"
 #include "../utils/CommonEnums.h"
 
 
@@ -86,6 +87,9 @@ namespace Sql::ItemTypes {
         ON i.item_type_id = t.id
     GROUP BY t.id;
     )";
+
+    std::string buildDynamicUpdateSql(const ItemTypeUpdate& type);
+
 
 }
 

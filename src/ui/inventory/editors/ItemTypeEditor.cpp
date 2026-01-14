@@ -122,6 +122,10 @@ void ItemTypeEditor::save()
         }
 
         // update to db
+        if (!db_.update(updateItemType, loadedItemType_->id, loadedItemType_->name,
+            loadedItemType_->typeNumber)) {
+            return;
+        }
     }
 
     emit updateView();
