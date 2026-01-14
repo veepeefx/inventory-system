@@ -3,28 +3,19 @@
 #include <QPushButton>
 
 #include "inventory/InventoryView.h"
+#include "settings/SettingsView.h"
 
 MainWindow::MainWindow(DataBase& db, QWidget *parent)
 : QMainWindow(parent)
 {
     QWidget *central = new QWidget();
+    mainLayout_ = new QGridLayout(central);
 
     viewStack_ = new QStackedWidget(this);
     viewStack_->addWidget(central);
 
-    InventoryView* itemInventory = new InventoryView(db, InventoryMode::ITEM);
-    viewStack_->addWidget(itemInventory);
-
-    InventoryView* itemTypeInventory = new InventoryView(db, InventoryMode::ITEM_TYPE);
-    viewStack_->addWidget(itemTypeInventory);
-
-    mainLayout_ = new QGridLayout(central);
-
+    initViews(db);
     initMainMenu();
-
-    // return feature for InventoryView
-    connect(itemInventory, &InventoryView::returnMainMenu, this, &MainWindow::switchViewToMainMenu);
-    connect(itemTypeInventory, &InventoryView::returnMainMenu, this, &MainWindow::switchViewToMainMenu);
 
     setCentralWidget(viewStack_);
     setWindowTitle("Inventory System");
@@ -32,6 +23,24 @@ MainWindow::MainWindow(DataBase& db, QWidget *parent)
 }
 
 MainWindow::~MainWindow() {}
+
+void MainWindow::initViews(DataBase& db)
+{
+    InventoryView* itemInventory = new InventoryView(db, InventoryMode::ITEM);
+    viewStack_->addWidget(itemInventory);
+
+    InventoryView* itemTypeInventory = new InventoryView(db, InventoryMode::ITEM_TYPE);
+    viewStack_->addWidget(itemTypeInventory);
+
+    SettingsView* settings = new SettingsView();
+    viewStack_->addWidget(settings);
+
+    // return feature
+    connect(itemInventory, &InventoryView::returnMainMenu, this, &MainWindow::switchViewToMainMenu);
+    connect(itemTypeInventory, &InventoryView::returnMainMenu, this, &MainWindow::switchViewToMainMenu);
+    connect(settings, &SettingsView::returnMainMenu, this, &MainWindow::switchViewToMainMenu);
+
+}
 
 void MainWindow::initMainMenu()
 {
@@ -68,6 +77,7 @@ void MainWindow::onItemTypeButtonClicked()
 
 void MainWindow::onSettingsButtonClicked()
 {
+    viewStack_->setCurrentIndex(Views::SETTINGS);
 }
 
 void MainWindow::onExitButtonClicked()

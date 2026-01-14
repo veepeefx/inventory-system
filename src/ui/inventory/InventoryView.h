@@ -45,6 +45,7 @@ private:
     DataBase& db_;
     InventoryMode mode_;
 
+    void initTable();
     void initSearchBar();
     void initInventoryControls();
     int selectedRowIndex() const;

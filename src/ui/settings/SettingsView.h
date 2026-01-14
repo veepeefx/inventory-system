@@ -13,10 +13,19 @@ public:
     ~SettingsView() override;
 
 private:
-    QVBoxLayout *mainLayout_;
+    QVBoxLayout* mainLayout_ = nullptr;
 
-private
-    slots:
+    void initSettings();
+    QGridLayout* initWindowSettings();
+    QGridLayout* initPresetSettings();
+
+    void initControls();
+
+private slots:
+    void saveSettings();
+
+signals:
+    void returnMainMenu();
 };
 
 

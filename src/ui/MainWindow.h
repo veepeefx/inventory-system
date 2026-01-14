@@ -10,7 +10,8 @@
 enum Views {
     MAIN_MENU,
     INVENTORY_ITEMS,
-    INVENTORY_ITEM_TYPES
+    INVENTORY_ITEM_TYPES,
+    SETTINGS
 };
 
 class MainWindow : public QMainWindow {
@@ -27,6 +28,8 @@ private:
 
     QStackedWidget* viewStack_;
     QGridLayout *mainLayout_;
+
+    void initViews(DataBase& db);
     void initMainMenu();
 
     QSize BUTTON_SIZE = {200, 75};

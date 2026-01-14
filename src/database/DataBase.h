@@ -31,7 +31,6 @@ public:
 
     std::vector<Item> searchItems(const Search& search);
 
-
 private:
 
     sqlite3 *db = nullptr;

@@ -14,18 +14,22 @@
 InventoryView::InventoryView(DataBase& db, InventoryMode mode, QWidget *parent)
 : QWidget(parent), db_(db), mode_(mode)
 {
+    mainLayout_ = new QVBoxLayout(this);
+
+    initSearchBar();
+    initTable();
+    initInventoryControls();
+}
+
+InventoryView::~InventoryView() {}
+
+void InventoryView::initTable()
+{
     table_ = new QTableView(this);
 
-    switch (mode) {
-        case InventoryMode::ITEM:
-            model_ = new ItemTableModel(db, this);
-            break;
-        case InventoryMode::ITEM_TYPE:
-            model_ = new ItemTypeTableModel(db, this);
-            break;
-        default:
-            return;
-    }
+    if      (mode_ == InventoryMode::ITEM) { model_ = new ItemTableModel(db_, this); }
+    else if (mode_ == InventoryMode::ITEM_TYPE) { model_ = new ItemTypeTableModel(db_, this); }
+    else { return; }
 
     model_->loadData();
     table_->setModel(model_);
@@ -34,18 +38,12 @@ InventoryView::InventoryView(DataBase& db, InventoryMode mode, QWidget *parent)
     table_->setSelectionMode(QAbstractItemView::SingleSelection);
     table_->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    mainLayout_ = new QVBoxLayout(this);
-
-    initSearchBar();
-    mainLayout_->addWidget(table_);
-    initInventoryControls();
-
     // removing visual focus from table
     table_->clearSelection();
     table_->setCurrentIndex(QModelIndex());
-}
 
-InventoryView::~InventoryView() {}
+    mainLayout_->addWidget(table_);
+}
 
 void InventoryView::initSearchBar()
 {
