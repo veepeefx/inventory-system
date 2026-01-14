@@ -16,8 +16,17 @@ public:
 private:
     const ItemType* loadedItemType = nullptr;
 
-    void initEditor();
+    void initItemList(const QGridLayout & layout, int& row);
 
+    void initEditor();
+    void initItemList(QGridLayout& layout, int& row);
+
+private slots:
+    // add item to item type
+    void addItem();
+
+    // remove item from item type
+    void removeItem();
 };
 
 

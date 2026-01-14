@@ -23,6 +23,8 @@ public:
 
 private:
 
+    QSize WINDOW_SIZE = {1000, 600};
+
     QStackedWidget* viewStack_;
     QGridLayout *mainLayout_;
     void initMainMenu();

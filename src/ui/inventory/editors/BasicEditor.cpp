@@ -8,7 +8,7 @@ BasicEditor::BasicEditor(DataBase& db, QWidget *parent)
 : QDialog(parent), db_(db)
 {
     mainLayout_ = new QVBoxLayout(this);
-    resize(800,500);
+    resize(EDITOR_SIZE);
 }
 
 BasicEditor::~BasicEditor()

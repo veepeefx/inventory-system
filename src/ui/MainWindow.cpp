@@ -28,7 +28,7 @@ MainWindow::MainWindow(DataBase& db, QWidget *parent)
 
     setCentralWidget(viewStack_);
     setWindowTitle("Inventory System");
-    resize(800, 600);
+    resize(WINDOW_SIZE);
 }
 
 MainWindow::~MainWindow() {}

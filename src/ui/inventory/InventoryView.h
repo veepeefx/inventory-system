@@ -58,7 +58,6 @@ private slots:
 
     void updateInventoryView();
     void openEditor(int row = -1);
-    //void openItemEditor(const Item* item = nullptr);
 
     void removeButtonClicked();
     void editButtonClicked();

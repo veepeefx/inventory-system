@@ -22,6 +22,9 @@ protected:
     void initControls();
     QLineEdit* newLineEdit(QGridLayout& layout, const QString &text, int row, int col = 0, int colSpan = 1);
 
+private:
+    const QSize EDITOR_SIZE = {800, 600};
+
 private slots:
     void saveButtonClicked();
 
