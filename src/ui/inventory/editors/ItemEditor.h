@@ -11,13 +11,11 @@ class ItemEditor : public BasicEditor {
     Q_OBJECT
 
 public:
-    explicit ItemEditor(DataBase& db, QWidget *parent = nullptr);
+    explicit ItemEditor(DataBase& db, const Item* item, QWidget *parent = nullptr);
     ~ItemEditor() override;
 
-    void openItem(const Item* item = nullptr);
-
 private:
-    const Item *loadedItem = nullptr;
+    const Item *loadedItem_;
 
     QLineEdit* idLineEdit_;
     QLineEdit* productNumberLineEdit_;
@@ -35,6 +33,7 @@ private:
     QLineEdit* createdLineEdit_;
 
     void initEditor();
+    void openItem();
 
 private slots:
     void save();

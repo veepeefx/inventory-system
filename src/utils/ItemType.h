@@ -7,7 +7,7 @@ struct ItemType {
     int id = 0;
     std::string name;
     std::string typeNumber;
-    std::string description;
+    std::string description;    // currently not shown in ui anywhere
     std::string selfLocation;
     std::vector<int> items;     // item ids saved
     int totalQuantity = 0;

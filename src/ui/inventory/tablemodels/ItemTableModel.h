@@ -19,6 +19,7 @@ public:
     void loadData(const Search& search) override;
     int getId(int row) override;
     Item* getItem(const int& row);
+    std::vector<int> getItemIds() const;
 
     int rowCount(const QModelIndex&) const override;
     int columnCount(const QModelIndex&) const override;

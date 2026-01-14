@@ -39,6 +39,15 @@ Item* ItemTableModel::getItem(const int &row)
     return &items_.at(row);
 }
 
+std::vector<int> ItemTableModel::getItemIds() const
+{
+    std::vector<int> vec;
+    for (const auto& item : items_) {
+        vec.push_back(item.id);
+    }
+    return vec;
+}
+
 int ItemTableModel::rowCount(const QModelIndex&) const
 {
     return items_.size();

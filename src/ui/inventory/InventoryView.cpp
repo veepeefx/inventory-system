@@ -192,15 +192,15 @@ void InventoryView::updateInventoryView()
 void InventoryView::openEditor(int row)
 {
     if (ItemTableModel* itemModel = dynamic_cast<ItemTableModel*>(model_)) {
-        ItemEditor* editor = new ItemEditor(db_, this);
-        editor->openItem(itemModel->getItem(row));
+        const Item* item = itemModel->getItem(row);
+        ItemEditor* editor = new ItemEditor(db_, item, this);
 
         connect(editor, &BasicEditor::itemUpdated, this, &InventoryView::updateInventoryView);
         editor->exec();
 
     } else if (ItemTypeTableModel* itemTypeModel = dynamic_cast<ItemTypeTableModel*>(model_)) {
-        ItemTypeEditor* editor = new ItemTypeEditor(db_, this);
-        editor->openItemType(itemTypeModel->getItemType(row));
+        const ItemType* itemType = itemTypeModel->getItemType(row);
+        ItemTypeEditor* editor = new ItemTypeEditor(db_, itemType, this);
 
         connect(editor, &BasicEditor::itemUpdated, this, &InventoryView::updateInventoryView);
         editor->exec();

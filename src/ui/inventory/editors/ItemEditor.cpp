@@ -7,12 +7,14 @@
 #include <QLineEdit>
 
 
-ItemEditor::ItemEditor(DataBase& db, QWidget *parent)
-: BasicEditor(db, parent)
+ItemEditor::ItemEditor(DataBase& db, const Item* item, QWidget *parent)
+: BasicEditor(db, parent), loadedItem_(item)
 {
     initEditor();
     initControls();
     connect(this, &BasicEditor::saveData, this, &ItemEditor::save);
+
+    openItem();
 
     setWindowTitle("Item Editor");
 }
@@ -66,38 +68,37 @@ void ItemEditor::initEditor()
     mainLayout_->addLayout(layout);
 }
 
-void ItemEditor::openItem(const Item* item)
+void ItemEditor::openItem()
 {
-    loadedItem = item;
-    if (loadedItem == nullptr) { return; }
+    if (loadedItem_ == nullptr) { return; }
 
     // update all lineEdits in editor to correspond loaded item
-    idLineEdit_->setText(QString::number(item->id));
-    nameLineEdit_->setText(QString::fromStdString(item->name));
-    productNumberLineEdit_->setText(QString::fromStdString(item->productNumber));
-    quantityLineEdit_->setText(QString::number(item->quantity));
-    eanLineEdit_->setText(QString::fromStdString(item->ean));
-    selfLocationLineEdit_->setText(QString::fromStdString(item->selfLocation));
-    priceNoVatLineEdit_->setText(QString::number(item->priceNoVat));
-    vatLineEdit_->setText(QString::number(item->vat));
-    discountLineEdit_->setText(QString::number(item->discount));
-    descriptionTextEdit_->setText(QString::fromStdString(item->description));
+    idLineEdit_->setText(QString::number(loadedItem_->id));
+    nameLineEdit_->setText(QString::fromStdString(loadedItem_->name));
+    productNumberLineEdit_->setText(QString::fromStdString(loadedItem_->productNumber));
+    quantityLineEdit_->setText(QString::number(loadedItem_->quantity));
+    eanLineEdit_->setText(QString::fromStdString(loadedItem_->ean));
+    selfLocationLineEdit_->setText(QString::fromStdString(loadedItem_->selfLocation));
+    priceNoVatLineEdit_->setText(QString::number(loadedItem_->priceNoVat));
+    vatLineEdit_->setText(QString::number(loadedItem_->vat));
+    discountLineEdit_->setText(QString::number(loadedItem_->discount));
+    descriptionTextEdit_->setText(QString::fromStdString(loadedItem_->description));
 
-    double price = item->priceNoVat * (1 + item->vat / 100);
+    double price = loadedItem_->priceNoVat * (1 + loadedItem_->vat / 100);
     priceLineEdit_->setText(QString::number(price));
 
-    double discountedPrice = price * (1 - item->discount / 100);
+    double discountedPrice = price * (1 - loadedItem_->discount / 100);
     discountedPriceLineEdit_->setText(QString::number(discountedPrice));
 
     // last modified and creation date
-    lastModifiedLineEdit_->setText(QString::fromStdString(item->modifiedAt));
-    createdLineEdit_->setText(QString::fromStdString(item->createdAt));
+    lastModifiedLineEdit_->setText(QString::fromStdString(loadedItem_->modifiedAt));
+    createdLineEdit_->setText(QString::fromStdString(loadedItem_->createdAt));
 }
 
 void ItemEditor::save()
 {
     // new item
-    if (loadedItem == nullptr) {
+    if (loadedItem_ == nullptr) {
 
         Item newItem;
         newItem.name = nameLineEdit_->text().toStdString();
@@ -120,36 +121,36 @@ void ItemEditor::save()
 
         ItemUpdate updateItem;
 
-        if (loadedItem->name != nameLineEdit_->text().toStdString()) {
+        if (loadedItem_->name != nameLineEdit_->text().toStdString()) {
             updateItem.name = nameLineEdit_->text().toStdString();
         }
-        if (loadedItem->productNumber != productNumberLineEdit_->text().toStdString()) {
+        if (loadedItem_->productNumber != productNumberLineEdit_->text().toStdString()) {
             updateItem.productNumber = productNumberLineEdit_->text().toStdString();
         }
-        if (loadedItem->quantity != quantityLineEdit_->text().toInt()) {
+        if (loadedItem_->quantity != quantityLineEdit_->text().toInt()) {
             updateItem.quantity = quantityLineEdit_->text().toInt();
         }
-        if (loadedItem->ean != eanLineEdit_->text().toStdString()) {
+        if (loadedItem_->ean != eanLineEdit_->text().toStdString()) {
             updateItem.ean = eanLineEdit_->text().toStdString();
         }
-        if (loadedItem->selfLocation != selfLocationLineEdit_->text().toStdString()) {
+        if (loadedItem_->selfLocation != selfLocationLineEdit_->text().toStdString()) {
             updateItem.selfLocation = selfLocationLineEdit_->text().toStdString();
         }
-        if (loadedItem->priceNoVat !=  priceNoVatLineEdit_->text().toDouble()) {
+        if (loadedItem_->priceNoVat !=  priceNoVatLineEdit_->text().toDouble()) {
             updateItem.priceNoVat = priceNoVatLineEdit_->text().toDouble();
         }
-        if (loadedItem->vat != vatLineEdit_->text().toDouble()) {
+        if (loadedItem_->vat != vatLineEdit_->text().toDouble()) {
             updateItem.vat = vatLineEdit_->text().toDouble();
         }
-        if (loadedItem->discount != discountLineEdit_->text().toDouble()) {
+        if (loadedItem_->discount != discountLineEdit_->text().toDouble()) {
             updateItem.discount = discountLineEdit_->text().toDouble();
         }
-        if (loadedItem->description != descriptionTextEdit_->toPlainText().toStdString()) {
+        if (loadedItem_->description != descriptionTextEdit_->toPlainText().toStdString()) {
             updateItem.description = descriptionTextEdit_->toPlainText().toStdString();
         }
 
-        if (!db_.updateItem(updateItem, loadedItem->id, loadedItem->name,
-                           loadedItem->productNumber)) {
+        if (!db_.updateItem(updateItem, loadedItem_->id, loadedItem_->name,
+                           loadedItem_->productNumber)) {
             // POP UP ALERT IF BOTH NAME AND PRODUCT NUMBER IS MISSING
             return;
         }

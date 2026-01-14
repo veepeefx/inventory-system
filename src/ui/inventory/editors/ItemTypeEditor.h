@@ -2,26 +2,35 @@
 #define INVENTORY_SYSTEM_ITEMTYPEEDITOR_H
 
 #include "BasicEditor.h"
+#include "../tablemodels/ItemTableModel.h"
 
 
 class ItemTypeEditor : public BasicEditor {
     Q_OBJECT
 
 public:
-    ItemTypeEditor(DataBase& db, QWidget* parent = nullptr);
+    ItemTypeEditor(DataBase& db, const ItemType* itemType = nullptr, QWidget* parent = nullptr);
     ~ItemTypeEditor();
 
-    void openItemType(const ItemType* type = nullptr);
-
 private:
-    const ItemType* loadedItemType = nullptr;
+    const ItemType* loadedItemType_;
 
-    void initItemList(const QGridLayout & layout, int& row);
+    QLineEdit* idLE_ = nullptr;
+    QLineEdit* typeLE_ = nullptr;
+    QLineEdit* nameLE_ = nullptr;
+    QLineEdit* selfLocationLE_ = nullptr;
+    QLineEdit* quantityLE_ = nullptr;
+    QLineEdit* lastModifiedLE_ = nullptr;
+    QLineEdit* createdLE_ = nullptr;
+    ItemTableModel* itemModel_ = nullptr;
 
     void initEditor();
     void initItemList(QGridLayout& layout, int& row);
+    void openItemType();
 
 private slots:
+    void save();
+
     // add item to item type
     void addItem();
 

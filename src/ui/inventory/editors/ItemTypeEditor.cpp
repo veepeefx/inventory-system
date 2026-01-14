@@ -6,11 +6,13 @@
 #include <QPushButton>
 
 
-ItemTypeEditor::ItemTypeEditor(DataBase& db, QWidget* parent)
-    : BasicEditor(db, parent)
+ItemTypeEditor::ItemTypeEditor(DataBase& db, const ItemType* itemType, QWidget* parent)
+    : BasicEditor(db, parent), loadedItemType_(itemType)
 {
     initEditor();
     initControls();
+
+    openItemType();
 
     setWindowTitle("Item Type Editor");
 }
@@ -18,24 +20,19 @@ ItemTypeEditor::ItemTypeEditor(DataBase& db, QWidget* parent)
 ItemTypeEditor::~ItemTypeEditor()
 {}
 
-void ItemTypeEditor::openItemType(const ItemType* type)
-{
-    loadedItemType = type;
-    if (type == nullptr) { return; }
-}
-
 void ItemTypeEditor::initEditor()
 {
     QGridLayout* layout = new QGridLayout();
     int row = 0;
 
-    QLineEdit* idLE = newLineEdit(*layout, "ID:", row++);
-    idLE->setDisabled(true);    // cant be modified
+    idLE_ = newLineEdit(*layout, "ID:", row++);
+    idLE_->setDisabled(true);    // cant be modified
 
-    QLineEdit* typeLE = newLineEdit(*layout, "Type Number:", row++);
-    QLineEdit* nameLE = newLineEdit(*layout, "Type Name:", row++, 0, 3);
-    QLineEdit* selfLocationLE = newLineEdit(*layout, "Self Location:", row);
-    QLineEdit* quantityLE = newLineEdit(*layout, "Total Quantity:", row++, 2);
+    typeLE_ = newLineEdit(*layout, "Type Number:", row++);
+    nameLE_ = newLineEdit(*layout, "Type Name:", row++, 0, 3);
+    selfLocationLE_ = newLineEdit(*layout, "Self Location:", row);
+    quantityLE_ = newLineEdit(*layout, "Total Quantity:", row++, 2);
+    quantityLE_->setDisabled(true); // user cannot change it is counted from items
 
     layout->addWidget(new QLabel(""), row++, 0);
 
@@ -43,10 +40,10 @@ void ItemTypeEditor::initEditor()
 
     layout->addWidget(new QLabel(""), row++, 0);
 
-    QLineEdit* lastModifiedLE = newLineEdit(*layout, "Last Modified:", row);
-    lastModifiedLE->setDisabled(true);   // updates automatically
-    QLineEdit* createdLE = newLineEdit(*layout, "Created At:", row++, 2);
-    createdLE->setDisabled(true);        // updates automatically
+    lastModifiedLE_ = newLineEdit(*layout, "Last Modified:", row);
+    lastModifiedLE_->setDisabled(true);   // updates automatically
+    createdLE_ = newLineEdit(*layout, "Created At:", row++, 2);
+    createdLE_->setDisabled(true);        // updates automatically
 
     layout->addWidget(new QLabel(""), row++, 0);
 
@@ -59,8 +56,8 @@ void ItemTypeEditor::initItemList(QGridLayout &layout, int& row)
     layout.addWidget(new QLabel("Linked Items:"), row++, 0);
 
     QTableView* table = new QTableView(this);
-    ItemTableModel* itemTable = new ItemTableModel(db_, this);
-    table->setModel(itemTable);
+    itemModel_ = new ItemTableModel(db_, this);
+    table->setModel(itemModel_);
 
     layout.addWidget(table, row++, 0, 1, 4);
 
@@ -70,13 +67,6 @@ void ItemTypeEditor::initItemList(QGridLayout &layout, int& row)
     QPushButton* addItemButton = new QPushButton("Add", this);
     QPushButton* removeItemButton = new QPushButton("Remove", this);
 
-    if (loadedItemType == nullptr) {
-        addItemButton->setEnabled(false);
-        addItemButton->setToolTip("Create item type before adding items");
-        removeItemButton->setEnabled(false);
-        removeItemButton->setToolTip("Create item type before adding items");
-    }
-
     connect(addItemButton, &QPushButton::clicked, this, &ItemTypeEditor::addItem);
     connect(removeItemButton, &QPushButton::clicked, this, &ItemTypeEditor::removeItem);
 
@@ -85,6 +75,50 @@ void ItemTypeEditor::initItemList(QGridLayout &layout, int& row)
     tableControlLayout->addStretch(0);
 
     layout.addLayout(tableControlLayout, row++, 0, 1, 4);
+}
+
+void ItemTypeEditor::openItemType()
+{
+    if (loadedItemType_ == nullptr) { return; }
+
+    idLE_->setText(QString::number(loadedItemType_->id));
+    nameLE_->setText(QString::fromStdString(loadedItemType_->name));
+    typeLE_->setText(QString::fromStdString(loadedItemType_->typeNumber));
+    selfLocationLE_->setText(QString::fromStdString(loadedItemType_->selfLocation));
+    quantityLE_->setText(QString::number(loadedItemType_->totalQuantity));
+    lastModifiedLE_->setText(QString::fromStdString(loadedItemType_->modifiedAt));
+    createdLE_->setText(QString::fromStdString(loadedItemType_->createdAt));
+}
+
+void ItemTypeEditor::save()
+{
+    if (loadedItemType_ == nullptr) {
+        ItemType newItemType;
+        newItemType.name = nameLE_->text().toStdString();
+        newItemType.typeNumber = typeLE_->text().toStdString();
+        newItemType.selfLocation = selfLocationLE_->text().toStdString();
+        newItemType.items = itemModel_->getItemIds();
+
+        // save to db
+
+    } else {
+        ItemTypeUpdate updateItemType;
+
+        if (loadedItemType_->name != nameLE_->text().toStdString()) {
+            updateItemType.name = nameLE_->text().toStdString();
+        }
+        if (loadedItemType_->typeNumber != typeLE_->text().toStdString()) {
+            updateItemType.typeNumber = typeLE_->text().toStdString();
+        }
+        if (loadedItemType_->selfLocation != selfLocationLE_->text().toStdString()) {
+            updateItemType.selfLocation = selfLocationLE_->text().toStdString();
+        }
+        if (loadedItemType_->items != itemModel_->getItemIds()) {
+            updateItemType.items = itemModel_->getItemIds();
+        }
+
+        // update to db
+    }
 }
 
 void ItemTypeEditor::addItem()
