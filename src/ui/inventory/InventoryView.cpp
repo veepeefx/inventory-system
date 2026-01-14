@@ -195,14 +195,14 @@ void InventoryView::openEditor(int row)
         const Item* item = itemModel->getItem(row);
         ItemEditor* editor = new ItemEditor(db_, item, this);
 
-        connect(editor, &BasicEditor::itemUpdated, this, &InventoryView::updateInventoryView);
+        connect(editor, &BasicEditor::updateView, this, &InventoryView::updateInventoryView);
         editor->exec();
 
     } else if (ItemTypeTableModel* itemTypeModel = dynamic_cast<ItemTypeTableModel*>(model_)) {
         const ItemType* itemType = itemTypeModel->getItemType(row);
         ItemTypeEditor* editor = new ItemTypeEditor(db_, itemType, this);
 
-        connect(editor, &BasicEditor::itemUpdated, this, &InventoryView::updateInventoryView);
+        connect(editor, &BasicEditor::updateView, this, &InventoryView::updateInventoryView);
         editor->exec();
     }
 }

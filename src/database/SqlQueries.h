@@ -71,8 +71,8 @@ namespace Sql::ItemTypes {
 
     constexpr const char* INSERT = R"(
     INSERT INTO item_types (
-        id, name, type_number, self_location, description, modified_at, created_at)
-    VALUES (?, ?, ?, ?, ?, ?);
+        name, type_number, self_location, description)
+    VALUES (?, ?, ?, ?);
     )";
 
     constexpr const char* REMOVE = "DELETE FROM item_types WHERE id = ?;";

@@ -11,6 +11,7 @@ ItemTypeEditor::ItemTypeEditor(DataBase& db, const ItemType* itemType, QWidget* 
 {
     initEditor();
     initControls();
+    connect(this, &BasicEditor::saveData, this, &ItemTypeEditor::save);
 
     openItemType();
 
@@ -97,9 +98,12 @@ void ItemTypeEditor::save()
         newItemType.name = nameLE_->text().toStdString();
         newItemType.typeNumber = typeLE_->text().toStdString();
         newItemType.selfLocation = selfLocationLE_->text().toStdString();
-        newItemType.items = itemModel_->getItemIds();
 
         // save to db
+        if (!db_.insert(newItemType)) {
+            // POP UP ALERT
+            return;
+        }
 
     } else {
         ItemTypeUpdate updateItemType;
@@ -119,6 +123,9 @@ void ItemTypeEditor::save()
 
         // update to db
     }
+
+    emit updateView();
+    accept();
 }
 
 void ItemTypeEditor::addItem()
