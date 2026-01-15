@@ -1,5 +1,5 @@
 #include "ItemEditor.h"
-#include "../../../utils/Tools.h"
+#include "../../../utils/ui/UiTools.h"
 
 #include <iostream>
 #include <QPushButton>
@@ -27,28 +27,28 @@ void ItemEditor::initEditor()
     QGridLayout *layout = new QGridLayout();
     int row = 0;
 
-    idLineEdit_ = Tools::newLineEdit(*layout, "ID:", row++);
+    idLineEdit_ = UiTools::newLineEdit(*layout, "ID:", row++);
     idLineEdit_->setDisabled(true);     // id cant be changed
 
-    productNumberLineEdit_ = Tools::newLineEdit(*layout, "Product Number:", row);
-    eanLineEdit_ = Tools::newLineEdit(*layout, "Ean:", row++, 2);
+    productNumberLineEdit_ = UiTools::newLineEdit(*layout, "Product Number:", row);
+    eanLineEdit_ = UiTools::newLineEdit(*layout, "Ean:", row++, 2);
 
-    nameLineEdit_ = Tools::newLineEdit(*layout, "Name:", row++, 0, 3);
-
-    layout->addWidget(new QLabel(""), row++, 0);
-
-    priceLineEdit_ = Tools::newLineEdit(*layout, "Price:", row);
-    priceNoVatLineEdit_ = Tools::newLineEdit(*layout, "Price (excl. VAT):", row, 2);
-    vatLineEdit_ = Tools::newLineEdit(*layout, "VAT:", row++, 4);
-
-    discountedPriceLineEdit_ = Tools::newLineEdit(*layout, "Discounted Price:", row);
-    discountLineEdit_ = Tools::newLineEdit(*layout, "Discount:", row++, 2);
+    nameLineEdit_ = UiTools::newLineEdit(*layout, "Name:", row++, 0, 3);
 
     layout->addWidget(new QLabel(""), row++, 0);
 
-    quantityLineEdit_ = Tools::newLineEdit(*layout, "Quantity:", row++);
+    priceLineEdit_ = UiTools::newLineEdit(*layout, "Price:", row);
+    priceNoVatLineEdit_ = UiTools::newLineEdit(*layout, "Price (excl. VAT):", row, 2);
+    vatLineEdit_ = UiTools::newLineEdit(*layout, "VAT:", row++, 4);
 
-    selfLocationLineEdit_ = Tools::newLineEdit(*layout, "Self location:", row++);
+    discountedPriceLineEdit_ = UiTools::newLineEdit(*layout, "Discounted Price:", row);
+    discountLineEdit_ = UiTools::newLineEdit(*layout, "Discount:", row++, 2);
+
+    layout->addWidget(new QLabel(""), row++, 0);
+
+    quantityLineEdit_ = UiTools::newLineEdit(*layout, "Quantity:", row++);
+
+    selfLocationLineEdit_ = UiTools::newLineEdit(*layout, "Self location:", row++);
 
     layout->addWidget(new QLabel(""), row++, 0);
 
@@ -59,9 +59,9 @@ void ItemEditor::initEditor()
 
     row += 4;
 
-    lastModifiedLineEdit_ = Tools::newLineEdit(*layout, "Last Modified:", row);
+    lastModifiedLineEdit_ = UiTools::newLineEdit(*layout, "Last Modified:", row);
     lastModifiedLineEdit_->setDisabled(true);   // updates automatically
-    createdLineEdit_ = Tools::newLineEdit(*layout, "Created At:", row++, 2);
+    createdLineEdit_ = UiTools::newLineEdit(*layout, "Created At:", row++, 2);
     createdLineEdit_->setDisabled(true);        // updates automatically
 
     layout->addWidget(new QLabel(""), row, 0);

@@ -14,15 +14,24 @@ public:
 
 private:
     QVBoxLayout* mainLayout_ = nullptr;
+    QVBoxLayout* searchFieldPresets = nullptr;
+
+
+    QMap<QString, QWidget*> settingsMap_;
 
     void initSettings();
-    QGridLayout* initWindowSettings();
+    QGridLayout* initOtherSettings();
     QGridLayout* initPresetSettings();
 
     void initControls();
+    void initSearchField(int index);
+    void deleteSearchField(int index);
 
 private slots:
+    // dynamically adjusts amount of search field settings
+    void updateSearch(int val);
     void saveSettings();
+
 
 signals:
     void returnMainMenu();
