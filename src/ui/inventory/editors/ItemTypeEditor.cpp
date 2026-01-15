@@ -1,5 +1,7 @@
 #include "ItemTypeEditor.h"
 #include "../tablemodels/ItemTableModel.h"
+#include "../../../utils/Tools.h"
+
 
 #include <QLabel>
 #include <QTableView>
@@ -26,13 +28,13 @@ void ItemTypeEditor::initEditor()
     QGridLayout* layout = new QGridLayout();
     int row = 0;
 
-    idLE_ = newLineEdit(*layout, "ID:", row++);
+    idLE_ = Tools::newLineEdit(*layout, "ID:", row++);
     idLE_->setDisabled(true);    // cant be modified
 
-    typeLE_ = newLineEdit(*layout, "Type Number:", row++);
-    nameLE_ = newLineEdit(*layout, "Type Name:", row++, 0, 3);
-    selfLocationLE_ = newLineEdit(*layout, "Self Location:", row);
-    quantityLE_ = newLineEdit(*layout, "Total Quantity:", row++, 2);
+    typeLE_ = Tools::newLineEdit(*layout, "Type Number:", row++);
+    nameLE_ = Tools::newLineEdit(*layout, "Type Name:", row++, 0, 3);
+    selfLocationLE_ = Tools::newLineEdit(*layout, "Self Location:", row);
+    quantityLE_ = Tools::newLineEdit(*layout, "Total Quantity:", row++, 2);
     quantityLE_->setDisabled(true); // user cannot change it is counted from items
 
     layout->addWidget(new QLabel(""), row++, 0);
@@ -41,9 +43,9 @@ void ItemTypeEditor::initEditor()
 
     layout->addWidget(new QLabel(""), row++, 0);
 
-    lastModifiedLE_ = newLineEdit(*layout, "Last Modified:", row);
+    lastModifiedLE_ = Tools::newLineEdit(*layout, "Last Modified:", row);
     lastModifiedLE_->setDisabled(true);   // updates automatically
-    createdLE_ = newLineEdit(*layout, "Created At:", row++, 2);
+    createdLE_ = Tools::newLineEdit(*layout, "Created At:", row++, 2);
     createdLE_->setDisabled(true);        // updates automatically
 
     layout->addWidget(new QLabel(""), row++, 0);

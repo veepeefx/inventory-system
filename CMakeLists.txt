@@ -32,7 +32,9 @@ add_executable(inventory-system src/main.cpp
         src/ui/inventory/editors/ItemTypeEditor.cpp
         src/ui/inventory/editors/ItemTypeEditor.h
         src/ui/inventory/editors/BasicEditor.cpp
-        src/ui/inventory/editors/BasicEditor.h)
+        src/ui/inventory/editors/BasicEditor.h
+        src/utils/Tools.cpp
+        src/utils/Tools.h)
 
 include_directories(third-party)
 target_link_libraries(inventory-system PRIVATE Qt6::Widgets)
