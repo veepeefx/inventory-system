@@ -3,9 +3,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QComboBox>
-#include <QCheckBox>
 
+#include "../../utils/ui/SearchFieldWidget.h"
 #include "editors/ItemEditor.h"
 #include "editors/ItemTypeEditor.h"
 #include "tablemodels/ItemTypeTableModel.h"
@@ -47,74 +46,30 @@ void InventoryView::initTable()
 
 void InventoryView::initSearchBar()
 {
-    QGridLayout* searchLayout = new QGridLayout();
-    searchLayout->setAlignment(Qt::AlignLeft);
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->setAlignment(Qt::AlignLeft);
 
     QLabel* searchLabel = new QLabel("Search:");
     searchLabel->setStyleSheet("font-size: 12pt; font-weight: bold;");
+    layout->addWidget(searchLabel);
 
-    std::vector<SearchWidgets> searches;
+    std::vector<SearchFieldWidget*> searchFields;
     for (int i = 0; i < SEARCH_PARAMETER_COUNT; i++) {
-        SearchWidgets search;
-        search.label = new QLabel("Parameter " + QString::number(i + 1) + ":", this);
-        search.lineEdit = new QLineEdit(this);
-        search.modeBox = new QComboBox(this);
-        search.typeBox = new QComboBox(this);
-        search.caseSensitivityBox = new QCheckBox("Case-sensitive", this);
-        search.applySizes();
-
-        searches.push_back(search);
-    }
-
-    for (auto it = SearchModeLabels.begin(); it != SearchModeLabels.end(); it++) {
-        // SearchMode enum -> int
-        int key = static_cast<int>(it.key());
-        QString text = it.value();
-
-        for (const SearchWidgets& s : searches) {
-            s.modeBox->addItem(text, key);
-        }
-    }
-
-    for (auto it = SearchTypeLabels.begin(); it != SearchTypeLabels.end(); it++) {
-        int key = static_cast<int>(it.key());
-        QString text = it.value();
-
-        for (const SearchWidgets& s : searches) {
-            s.typeBox->addItem(text, key);
-        }
+        SearchFieldWidget* search = new SearchFieldWidget(i + 1, true, this);
+        search->applyInventorySizes();
+        searchFields.push_back(search);
+        layout->addWidget(search);
     }
 
     QPushButton* searchButton = new QPushButton("Search");
+    searchButton->setMaximumWidth(200);
+    layout->addWidget(searchButton);
 
-    connect(searchButton, &QPushButton::clicked, this,
-        [this, searches]() {
-        makeSearch(searches);
+    connect(searchButton, &QPushButton::clicked, this, [this, searchFields]() {
+        makeSearch(searchFields);
     });
 
-    int row = 0;
-    searchLayout->addWidget(searchLabel, row, 0, 1, 1);
-
-    row++;
-
-    for (const SearchWidgets& s : searches) {
-        searchLayout->addWidget(s.label, row, 0, 1, 1);
-        searchLayout->addWidget(s.typeBox, row, 1, 1, 1);
-        searchLayout->addWidget(s.lineEdit, row, 2, 1, 1);
-        searchLayout->addWidget(s.modeBox, row, 3, 1, 1);
-        searchLayout->addWidget(s.caseSensitivityBox, row, 4, 1, 1);
-
-        row++;
-    }
-
-    searchLayout->addWidget(searchButton, row, 0, 1, 1);
-
-    row++;
-
-    searchLayout->addItem( new QSpacerItem(0, 10, QSizePolicy::Expanding, QSizePolicy::Minimum),
-                           row, 5, 1, 1);
-
-    mainLayout_->addLayout(searchLayout);
+    mainLayout_->addLayout(layout);
 }
 
 void InventoryView::initInventoryControls()
@@ -153,33 +108,25 @@ int InventoryView::selectedRowIndex() const
     return row;
 }
 
-void InventoryView::makeSearch(const std::vector<SearchWidgets>& searches)
+
+void InventoryView::makeSearch(const std::vector<SearchFieldWidget*>& searchFields)
 {
-    // check if all search bars are empty don't make search rather just show items from id 0->
-    bool allEmpty = true;
-
-    for (const SearchWidgets& s : searches) {
-        if (!s.lineEdit->text().trimmed().isEmpty()) {
-            allEmpty = false;
-            break;
-        }
-    }
-
-    if (allEmpty) {
-        model_->loadData();
-        return;
-    }
-
     Search search;
-    for (const SearchWidgets& s : searches) {
-        if (!s.lineEdit->text().isEmpty()) {
-            search.terms.push_back(s.lineEdit->text().toStdString());
-            search.modes.push_back(static_cast<SearchMode>(s.modeBox->currentIndex()));
-            search.types.push_back(static_cast<SearchType>(s.typeBox->currentIndex()));
-            search.caseSensitivity.push_back(s.caseSensitivityBox->isChecked());
+    for (const auto& sf : searchFields) {
+        // keeping track if search term is given
+        QString text = sf->getSearchText().trimmed();
+        if (!text.isEmpty()) {
+            // saving all to search
+            search.modes.push_back(sf->getSearchMode());
+            search.terms.push_back(text.toStdString());
+            search.types.push_back(sf->getSearchType());
+            search.caseSensitivity.push_back(sf->getCaseSensitivity());
         }
     }
-    model_->loadData(search);
+
+    // make fill with all data or with search data
+    if (search.terms.empty()) { model_->loadData(); }
+    else { model_->loadData(search); }
 }
 
 void InventoryView::updateInventoryView()

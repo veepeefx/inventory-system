@@ -1,29 +1,12 @@
 #ifndef INVENTORY_SYSTEM_INVENTORYVIEW_H
 #define INVENTORY_SYSTEM_INVENTORYVIEW_H
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QLabel>
-#include <QLineEdit>
 #include <QTableView>
 
 #include "tablemodels/ItemTableModel.h"
 #include "../../database/DataBase.h"
+#include "../../utils/ui/SearchFieldWidget.h"
 
-struct SearchWidgets {
-    QLabel* label = nullptr;
-    QLineEdit* lineEdit = nullptr;
-    QComboBox* modeBox = nullptr;
-    QComboBox* typeBox = nullptr;
-    QCheckBox* caseSensitivityBox = nullptr;
-
-    void applySizes() const {
-        if (lineEdit) { lineEdit->setFixedWidth(200); }
-        if (modeBox) { modeBox->setFixedWidth(150); }
-        if (typeBox) { typeBox->setFixedWidth(100); }
-        if (caseSensitivityBox) { caseSensitivityBox->setFixedWidth(100); }
-    }
-};
 
 class InventoryView : public QWidget {
     Q_OBJECT
@@ -34,7 +17,6 @@ public:
     ~InventoryView() override;
 
 private:
-
     // how many search parameters are used in inventoryView
     const int SEARCH_PARAMETER_COUNT = 2;
 
@@ -50,7 +32,7 @@ private:
     void initInventoryControls();
     int selectedRowIndex() const;
 
-    void makeSearch(const std::vector<SearchWidgets>& searches);
+    void makeSearch(const std::vector<SearchFieldWidget*>& searchFields);
 
 signals:
     void returnMainMenu();

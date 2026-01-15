@@ -15,7 +15,7 @@ public:
     SearchFieldWidget(int index, bool searchBar = false, QWidget* parent = nullptr) : QWidget(parent)
     {
         QHBoxLayout* layout = new QHBoxLayout(this);
-        layout->setContentsMargins(5, 5, 5, 5);
+        layout->setContentsMargins(0, 0, 0, 0);
 
         label_ = new QLabel("Parameter " + QString::number(index) + ":", this);
         typeComboBox_ = new QComboBox();
@@ -32,6 +32,7 @@ public:
 
         layout->addWidget(typeComboBox_);
         layout->addWidget(caseSensitiveBox_);
+        layout->addStretch();
 
         fillComboBoxes();
     }
