@@ -1,4 +1,7 @@
 #include "SettingsView.h"
+
+#include <iostream>
+
 #include "../../utils/ui/UiTools.h"
 #include "../../utils/ui/SearchFieldWidget.h"
 #include "../../utils/Settings.h"
@@ -54,13 +57,15 @@ QGridLayout* SettingsView::initPresetSettings()
     header->setStyleSheet("font-weight: bold; font-size: 14pt;");
     layout->addWidget(header, row++, 0, 1, 2);
 
-    QSpinBox* numOfSearchFields_ = UiTools::newSpinBox(*layout, "Number of Search Fields", row++, 1, 4);
-    connect(numOfSearchFields_, &QSpinBox::valueChanged, this, &SettingsView::updateSearch);
-
     searchLayout = new QVBoxLayout();
     searchLayout->setAlignment(Qt::AlignTop);
     layout->addLayout(searchLayout, row++, 0, 2, 2);
 
+    QSpinBox* numOfSearchFields_ = UiTools::newSpinBox(*layout, "Number of Search Fields", row++);
+    connect(numOfSearchFields_, &QSpinBox::valueChanged, this, &SettingsView::updateSearch);
+    // setting range here as if we declare it before connect if searchFields.size() == 1
+    // updateSearch isn't being called
+    numOfSearchFields_->setRange(1, 4);
     numOfSearchFields_->setValue(SettingsManager::getSettings().searchFields.size());
 
     return layout;
@@ -109,6 +114,7 @@ void SettingsView::deleteSearchField()
 void SettingsView::updateSearch(int val)
 {
     int current = searchLayout->count();
+
     if (current == val) { return; }
 
     // creates if too little
