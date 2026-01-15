@@ -4,6 +4,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "../../SettingsManager.h"
 #include "../../utils/ui/SearchFieldWidget.h"
 #include "editors/ItemEditor.h"
 #include "editors/ItemTypeEditor.h"
@@ -54,8 +55,9 @@ void InventoryView::initSearchBar()
     layout->addWidget(searchLabel);
 
     std::vector<SearchFieldWidget*> searchFields;
-    for (int i = 0; i < SEARCH_PARAMETER_COUNT; i++) {
-        SearchFieldWidget* search = new SearchFieldWidget(i + 1, true, this);
+    int fieldCount = SettingsManager::getSettings().searchFields.size();
+    for (int i = 0; i < fieldCount; i++) {
+        SearchFieldWidget* search = new SearchFieldWidget(i, true, this);
         search->applyInventorySizes();
         searchFields.push_back(search);
         layout->addWidget(search);

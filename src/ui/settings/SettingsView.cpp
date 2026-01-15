@@ -1,12 +1,14 @@
 #include "SettingsView.h"
 #include "../../utils/ui/UiTools.h"
+#include "../../utils/ui/SearchFieldWidget.h"
+#include "../../utils/Settings.h"
+#include "../../SettingsManager.h"
 
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QSpinBox>
 
-#include "../../utils/ui/SearchFieldWidget.h"
 
 
 SettingsView::SettingsView(QWidget *parent) : QWidget(parent)
@@ -56,9 +58,10 @@ QGridLayout* SettingsView::initPresetSettings()
     connect(numOfSearchFields_, &QSpinBox::valueChanged, this, &SettingsView::updateSearch);
 
     searchLayout = new QVBoxLayout();
+    searchLayout->setAlignment(Qt::AlignTop);
     layout->addLayout(searchLayout, row++, 0, 2, 2);
 
-    numOfSearchFields_->setValue(2);   // TEMP FOR TESTING
+    numOfSearchFields_->setValue(SettingsManager::getSettings().searchFields.size());
 
     return layout;
 }
@@ -79,7 +82,6 @@ void SettingsView::initControls()
 {
     QPushButton* cancelButton = new QPushButton("Cancel", this);
     QPushButton* saveButton = new QPushButton("Save", this);
-    saveButton->setEnabled(false);  // settings not implemented yet
 
     connect(cancelButton, &QPushButton::clicked, this, &SettingsView::returnMainMenu);
     connect(saveButton, &QPushButton::clicked, this, &SettingsView::saveSettings);
@@ -93,11 +95,9 @@ void SettingsView::initControls()
 
 void SettingsView::initSearchField(int index)
 {
-    SearchFieldWidget* search = new SearchFieldWidget(index + 1, false, this);
+    SearchFieldWidget* search = new SearchFieldWidget(index, false, this);
     allSearchFields.push_back(search);
-
     searchLayout->addWidget(search);
-    searchLayout->setAlignment(Qt::AlignTop);
 }
 
 void SettingsView::deleteSearchField()
@@ -126,5 +126,16 @@ void SettingsView::updateSearch(int val)
 
 void SettingsView::saveSettings()
 {
+    Settings s;
+    for (int i = 0; i < allSearchFields.size(); i++) {
+        SearchFieldWidget* searchField = allSearchFields[i];
+        s.searchFields.push_back({
+            searchField->getSearchMode(),
+            searchField->getSearchType(),
+            searchField->getCaseSensitivity()
+        });
+    }
+
+    SettingsManager::saveSettings(s);
     emit returnMainMenu();
 }

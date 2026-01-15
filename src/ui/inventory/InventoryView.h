@@ -17,8 +17,6 @@ public:
     ~InventoryView() override;
 
 private:
-    // how many search parameters are used in inventoryView
-    const int SEARCH_PARAMETER_COUNT = 2;
 
     QVBoxLayout *mainLayout_;
 

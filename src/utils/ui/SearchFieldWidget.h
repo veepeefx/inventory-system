@@ -7,17 +7,20 @@
 #include <QWidget>
 
 #include "../CommonEnums.h"
+#include "../../SettingsManager.h"
 
 class SearchFieldWidget : public QWidget {
     Q_OBJECT
 
 public:
-    SearchFieldWidget(int index, bool searchBar = false, QWidget* parent = nullptr) : QWidget(parent)
+    // index starts from 0
+    SearchFieldWidget(int index, bool searchBar = false, QWidget* parent = nullptr)
+    : QWidget(parent)
     {
         QHBoxLayout* layout = new QHBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
 
-        label_ = new QLabel("Parameter " + QString::number(index) + ":", this);
+        label_ = new QLabel("Parameter " + QString::number(index + 1) + ":", this);
         typeComboBox_ = new QComboBox();
         modeComboBox_ = new QComboBox();
         caseSensitiveBox_ = new QCheckBox("Case Sensitivity");
@@ -35,6 +38,7 @@ public:
         layout->addStretch();
 
         fillComboBoxes();
+        setSettings(index);
     }
 
     SearchType getSearchType() const
@@ -84,6 +88,16 @@ private:
             QString text = it.value();
             typeComboBox_->addItem(text,key);
         }
+    }
+
+    void setSettings(int index)
+    {
+        if (SettingsManager::getSettings().searchFields.size() <= index) { return; }
+
+        SearchField fieldSettings = SettingsManager::getSettings().searchFields[index];
+        typeComboBox_->setCurrentIndex(static_cast<int>(fieldSettings.type));
+        modeComboBox_->setCurrentIndex(static_cast<int>(fieldSettings.mode));
+        caseSensitiveBox_->setChecked(fieldSettings.caseSensitive);
     }
 
 };
