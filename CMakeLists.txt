@@ -34,7 +34,8 @@ add_executable(inventory-system src/main.cpp
         src/ui/inventory/editors/BasicEditor.cpp
         src/ui/inventory/editors/BasicEditor.h
         src/utils/ui/UiTools.cpp
-        src/utils/ui/UiTools.h)
+        src/utils/ui/UiTools.h
+        src/utils/ui/SearchFieldWidget.h)
 
 include_directories(third-party)
 target_link_libraries(inventory-system PRIVATE Qt6::Widgets)

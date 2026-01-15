@@ -1,12 +1,12 @@
 #include "SettingsView.h"
 #include "../../utils/ui/UiTools.h"
-#include "../../utils/CommonEnums.h"
 
-#include <QCheckBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QSpinBox>
+
+#include "../../utils/ui/SearchFieldWidget.h"
 
 
 SettingsView::SettingsView(QWidget *parent) : QWidget(parent)
@@ -52,14 +52,13 @@ QGridLayout* SettingsView::initPresetSettings()
     header->setStyleSheet("font-weight: bold; font-size: 14pt;");
     layout->addWidget(header, row++, 0, 1, 2);
 
-    QSpinBox* numOfFields = UiTools::newSpinBox(*layout, "Number of Search Fields", row++, 1, 4);
-    settingsMap_["numOfSearchFields"] = numOfFields;
-    connect(numOfFields, &QSpinBox::valueChanged, this, &SettingsView::updateSearch);
+    QSpinBox* numOfSearchFields_ = UiTools::newSpinBox(*layout, "Number of Search Fields", row++, 1, 4);
+    connect(numOfSearchFields_, &QSpinBox::valueChanged, this, &SettingsView::updateSearch);
 
-    searchFieldPresets = new QVBoxLayout();
-    layout->addLayout(searchFieldPresets, row++, 0, 2, 2);
+    searchLayout = new QVBoxLayout();
+    layout->addLayout(searchLayout, row++, 0, 2, 2);
 
-    numOfFields->setValue(2);   // TEMP FOR TESTING
+    numOfSearchFields_->setValue(2);   // TEMP FOR TESTING
 
     return layout;
 }
@@ -94,52 +93,22 @@ void SettingsView::initControls()
 
 void SettingsView::initSearchField(int index)
 {
-    QHBoxLayout* layout = new QHBoxLayout();
-    QLabel* search = new QLabel("Parameter " + QString::number(index + 1) + ":");
-    QComboBox* modeComboBox = new QComboBox();
-    QComboBox* typeComboBox = new QComboBox();
-    QCheckBox* caseSensitive = new QCheckBox("Case Sensitivity");
+    SearchFieldWidget* search = new SearchFieldWidget(index + 1, false, this);
+    allSearchFields.push_back(search);
 
-    // fills combo boxes
-    for (auto it = SearchModeLabels.begin(); it != SearchModeLabels.end(); it++) {
-        int key = static_cast<int>(it.key());
-        QString text = it.value();
-        modeComboBox->addItem(text, key);
-    }
-    for (auto it = SearchTypeLabels.begin(); it != SearchTypeLabels.end(); it++) {
-        int key = static_cast<int>(it.key());
-        QString text = it.value();
-        typeComboBox->addItem(text,key);
-    }
-
-    layout->addWidget(search);
-    layout->addWidget(modeComboBox);
-    layout->addWidget(typeComboBox);
-    layout->addWidget(caseSensitive);
-
-    searchFieldPresets->setAlignment(Qt::AlignTop);
-    searchFieldPresets->addLayout(layout);
+    searchLayout->addWidget(search);
+    searchLayout->setAlignment(Qt::AlignTop);
 }
 
-void SettingsView::deleteSearchField(int index)
+void SettingsView::deleteSearchField()
 {
-    QLayoutItem* lastItem = searchFieldPresets->takeAt(index);
-    if (lastItem && lastItem->layout()) {
-        QLayout* subLayout = lastItem->layout();
-
-        while (QLayoutItem* child = subLayout->takeAt(0)) {
-            if (child->widget()) {
-                child->widget()->setParent(nullptr);
-                child->widget()->deleteLater();
-            }
-        }
-        delete subLayout;
-    }
+    delete allSearchFields.back();
+    allSearchFields.pop_back();
 }
 
 void SettingsView::updateSearch(int val)
 {
-    int current = searchFieldPresets->count();
+    int current = searchLayout->count();
     if (current == val) { return; }
 
     // creates if too little
@@ -150,7 +119,7 @@ void SettingsView::updateSearch(int val)
     // removes if too much
     } else if (current > val) {
         for(int i = current - 1; i >= val; --i) {
-            deleteSearchField(i);
+            deleteSearchField();
         }
     }
 }

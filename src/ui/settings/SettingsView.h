@@ -1,8 +1,14 @@
 #ifndef INVENTORY_SYSTEM_SETTINGSVIEW_H
 #define INVENTORY_SYSTEM_SETTINGSVIEW_H
 
+#include <QCheckBox>
+#include <QComboBox>
+#include <QSpinBox>
 #include <QWidget>
 #include <QVBoxLayout>
+
+#include "../../utils/ui/SearchFieldWidget.h"
+
 
 class SettingsView : public QWidget {
     Q_OBJECT
@@ -13,11 +19,13 @@ public:
     ~SettingsView() override;
 
 private:
+
     QVBoxLayout* mainLayout_ = nullptr;
-    QVBoxLayout* searchFieldPresets = nullptr;
+    QVBoxLayout* searchLayout = nullptr;
 
+    QVector<QComboBox*> searchTypes;
+    QVector<SearchFieldWidget*> allSearchFields;
 
-    QMap<QString, QWidget*> settingsMap_;
 
     void initSettings();
     QGridLayout* initOtherSettings();
@@ -25,7 +33,7 @@ private:
 
     void initControls();
     void initSearchField(int index);
-    void deleteSearchField(int index);
+    void deleteSearchField();
 
 private slots:
     // dynamically adjusts amount of search field settings
