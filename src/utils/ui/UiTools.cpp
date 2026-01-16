@@ -2,25 +2,25 @@
 
 #include <QLabel>
 
-QLineEdit* UiTools::newLineEdit(QGridLayout& layout, const QString &text, int row, int col, int colSpan)
+QLineEdit* UiTools::newLineEdit(const QString &text, const GridInfo& info)
 {
     QLabel* label = new QLabel(text);
     QLineEdit* lineEdit = new QLineEdit();
 
-    layout.addWidget(label, row, col);
-    layout.addWidget(lineEdit, row, col + 1, 1, colSpan);
+    info.layout.addWidget(label, info.row, info.col);
+    info.layout.addWidget(lineEdit, info.row, info.col + 1, 1, info.colSpan);
 
     return lineEdit;
 }
 
-QSpinBox *UiTools::newSpinBox(QGridLayout &layout, const QString &text, int row, int min, int max)
+QSpinBox *UiTools::newSpinBox(const QString &text, int min, int max, const GridInfo& info)
 {
     QLabel* label = new QLabel(text);
     QSpinBox* spinBox = new QSpinBox();
     spinBox->setRange(min, max);
 
-    layout.addWidget(label, row, 0);
-    layout.addWidget(spinBox, row, 1);
+    info.layout.addWidget(label, info.row, 0);
+    info.layout.addWidget(spinBox, info.row, 1);
 
     return spinBox;
 }
@@ -34,4 +34,18 @@ QComboBox *UiTools::newComboBox(QGridLayout &layout, const QString &text, int ro
     layout.addWidget(comboBox, row, 1);
 
     return comboBox;
+}
+
+QDoubleSpinBox *UiTools::newDoubleSpinBox(const QString &text, int min, float step, float val, const GridInfo& info)
+{
+    QLabel* label = new QLabel(text);
+    QDoubleSpinBox* doubleSpinBox = new QDoubleSpinBox();
+    doubleSpinBox->setMinimum(min);
+    doubleSpinBox->setSingleStep(step);
+    doubleSpinBox->setValue(val);
+
+    info.layout.addWidget(label, info.row, info.col);
+    info.layout.addWidget(doubleSpinBox, info.row, info.col + 1, 1, info.colSpan);
+
+    return doubleSpinBox;
 }

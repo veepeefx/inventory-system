@@ -56,6 +56,7 @@ Settings SettingsManager::defaultSettings()
 
     s.searchFields.push_back({SearchMode::NAME, SearchType::STARTS_WITH, false});
     s.searchFields.push_back({SearchMode::PRODUCT_NUMBER, SearchType::STARTS_WITH, false});
+    s.presetVat = 25.5;
 
     return s;
 }
