@@ -24,7 +24,8 @@ public:
     static QComboBox* newComboBox(QGridLayout& layout, const QString &text,
                                   int row);
 
-    static QDoubleSpinBox* newDoubleSpinBox(const QString &text, int min, float step, float val, const GridInfo& info);
+    static QDoubleSpinBox* newDoubleSpinBox(const QString &text, int min, int max, int decimals,
+                        double step, float val, const QString& prefix, const GridInfo& info);
 
 
 private:

@@ -59,7 +59,7 @@ QGridLayout* SettingsView::initPresetSettings()
     layout->addWidget(header, row++, 0, 1, 2);
 
     vatDSB_ = UiTools::newDoubleSpinBox(
-        "Preset VAT for item", 0, 0.25, settings.presetVat, {*layout, row++});
+        "Preset VAT for item", 0, 1000, 2, 0.25, settings.presetVat, "%", {*layout, row++});
 
     searchLayout = new QVBoxLayout();
     searchLayout->setAlignment(Qt::AlignTop);

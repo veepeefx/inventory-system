@@ -36,12 +36,15 @@ QComboBox *UiTools::newComboBox(QGridLayout &layout, const QString &text, int ro
     return comboBox;
 }
 
-QDoubleSpinBox *UiTools::newDoubleSpinBox(const QString &text, int min, float step, float val, const GridInfo& info)
+QDoubleSpinBox *UiTools::newDoubleSpinBox(const QString &text, int min, int max, int decimals,
+                        double step, float val, const QString& prefix, const GridInfo& info)
 {
     QLabel* label = new QLabel(text);
     QDoubleSpinBox* doubleSpinBox = new QDoubleSpinBox();
-    doubleSpinBox->setMinimum(min);
+    doubleSpinBox->setDecimals(decimals);
+    doubleSpinBox->setRange(min, max);
     doubleSpinBox->setSingleStep(step);
+    doubleSpinBox->setSuffix(prefix);
     doubleSpinBox->setValue(val);
 
     info.layout.addWidget(label, info.row, info.col);
