@@ -38,13 +38,7 @@ void ItemEditor::initEditor()
 
     layout->addWidget(new QLabel(""), row++, 0);
 
-    priceLineEdit_ = UiTools::newLineEdit("Price:", {*layout, row});
-    priceNoVatLineEdit_ = UiTools::newLineEdit("Price (excl. VAT):", {*layout, row, 2});
-    vatLineEdit_ = UiTools::newLineEdit("VAT:", {*layout, row++, 4});
-    vatLineEdit_->setText(std::to_string(SettingsManager::getSettings().presetVat).data());
-
-    discountedPriceLineEdit_ = UiTools::newLineEdit("Discounted Price:", {*layout, row});
-    discountLineEdit_ = UiTools::newLineEdit("Discount:", {*layout, row++, 2});
+    initPrices(*layout, row);
 
     layout->addWidget(new QLabel(""), row++, 0);
 
@@ -69,6 +63,33 @@ void ItemEditor::initEditor()
     mainLayout_->addLayout(layout);
 }
 
+void ItemEditor::initPrices(QGridLayout &layout, int& row)
+{
+    const Settings settings = SettingsManager::getSettings();
+    int minVal = -999999999, maxVal = 999999999;
+
+    priceDSB_ = UiTools::newDoubleSpinBox(
+        "Price:", minVal, maxVal, 2, 0.01, 0, "€", {layout, row});
+
+    priceNoVatDSB_ = UiTools::newDoubleSpinBox(
+        "Price (excl. VAT):", minVal, maxVal, 2, 0.01, 0, "€", {layout, row, 2});
+
+    vatDSB_ = UiTools::newDoubleSpinBox(
+        "VAT:", 0, maxVal, 2, 0.25, settings.presetVat, "%", {layout, row++, 4});
+
+    discountedPriceDSB_ = UiTools::newDoubleSpinBox(
+        "Discounted Price:", minVal, maxVal, 2, 0.01, 0, "€", {layout, row});
+
+    discountDSB_ = UiTools::newDoubleSpinBox(
+        "Discount:", 0, maxVal, 2, 0.25, 0, "%", {layout, row++, 2});
+
+    connect(priceDSB_, &QDoubleSpinBox::valueChanged, this, &ItemEditor::priceChanged);
+    connect(priceNoVatDSB_, &QDoubleSpinBox::valueChanged, this, &ItemEditor::priceNoVatChanged);
+    connect(vatDSB_, &QDoubleSpinBox::valueChanged, this, &ItemEditor::vatChanged);
+    connect(discountedPriceDSB_, &QDoubleSpinBox::valueChanged, this, &ItemEditor::discountedPriceChanged);
+    connect(discountDSB_, &QDoubleSpinBox::valueChanged, this, &ItemEditor::discountChanged);
+}
+
 void ItemEditor::openItem()
 {
     if (loadedItem_ == nullptr) { return; }
@@ -80,20 +101,83 @@ void ItemEditor::openItem()
     quantityLineEdit_->setText(QString::number(loadedItem_->quantity));
     eanLineEdit_->setText(QString::fromStdString(loadedItem_->ean));
     selfLocationLineEdit_->setText(QString::fromStdString(loadedItem_->selfLocation));
-    priceNoVatLineEdit_->setText(QString::number(loadedItem_->priceNoVat));
-    vatLineEdit_->setText(QString::number(loadedItem_->vat));
-    discountLineEdit_->setText(QString::number(loadedItem_->discount));
     descriptionTextEdit_->setText(QString::fromStdString(loadedItem_->description));
 
-    double price = loadedItem_->priceNoVat * (1 + loadedItem_->vat / 100);
-    priceLineEdit_->setText(QString::number(price));
-
-    double discountedPrice = price * (1 - loadedItem_->discount / 100);
-    discountedPriceLineEdit_->setText(QString::number(discountedPrice));
+    // set prices (others will be calculated automatically)
+    vatDSB_->setValue(loadedItem_->vat);
+    priceNoVatDSB_->setValue(loadedItem_->priceNoVat);
+    discountDSB_->setValue(loadedItem_->discount);
 
     // last modified and creation date
     lastModifiedLineEdit_->setText(QString::fromStdString(loadedItem_->modifiedAt));
     createdLineEdit_->setText(QString::fromStdString(loadedItem_->createdAt));
+}
+
+void ItemEditor::priceChanged()
+{
+    double priceNoVat = priceDSB_->value() / (1 + vatDSB_->value() / 100.0);
+    priceNoVatDSB_->blockSignals(true);
+    priceNoVatDSB_->setValue(priceNoVat);
+    priceNoVatDSB_->blockSignals(false);
+
+    double discountedPrice = priceDSB_->value() * (1 - discountDSB_->value() / 100.0);
+    discountedPriceDSB_->blockSignals(true);
+    discountedPriceDSB_->setValue(discountedPrice);
+    discountedPriceDSB_->blockSignals(false);
+}
+
+void ItemEditor::priceNoVatChanged()
+{
+    double price = priceNoVatDSB_->value() * (1 + vatDSB_->value() / 100.0);
+    priceDSB_->blockSignals(true);
+    priceDSB_->setValue(price);
+    priceDSB_->blockSignals(false);
+
+    double discountedPrice = priceDSB_->value() * (1 - discountDSB_->value() / 100.0);
+    discountedPriceDSB_->blockSignals(true);
+    discountedPriceDSB_->setValue(discountedPrice);
+    discountedPriceDSB_->blockSignals(false);
+}
+
+void ItemEditor::vatChanged()
+{
+    double price = priceNoVatDSB_->value() * (1 + vatDSB_->value() / 100.0);
+    priceDSB_->blockSignals(true);
+    priceDSB_->setValue(price);
+    priceDSB_->blockSignals(false);
+
+    double discountedPrice = priceDSB_->value() * (1 - discountDSB_->value() / 100.0);
+    discountedPriceDSB_->blockSignals(true);
+    discountedPriceDSB_->setValue(discountedPrice);
+    discountedPriceDSB_->blockSignals(false);
+}
+
+void ItemEditor::discountedPriceChanged()
+{
+    if (discountedPriceDSB_->value() > priceDSB_->value()) {
+        discountedPriceDSB_->blockSignals(true);
+        discountedPriceDSB_->setValue(priceDSB_->value());
+        discountedPriceDSB_->blockSignals(false);
+
+        discountDSB_->blockSignals(true);
+        discountDSB_->setValue(0);
+        discountDSB_->blockSignals(false);
+
+        return;
+    }
+
+    double discount = (priceDSB_->value() - discountedPriceDSB_->value()) / priceDSB_->value() * 100.0;
+    discountDSB_->blockSignals(true);
+    discountDSB_->setValue(discount);
+    discountDSB_->blockSignals(false);
+}
+
+void ItemEditor::discountChanged()
+{
+    double discountedPrice = priceDSB_->value() * (1 - discountDSB_->value() / 100.0);
+    discountedPriceDSB_->blockSignals(true);
+    discountedPriceDSB_->setValue(discountedPrice);
+    discountedPriceDSB_->blockSignals(false);
 }
 
 void ItemEditor::save()
@@ -107,9 +191,12 @@ void ItemEditor::save()
         newItem.quantity = quantityLineEdit_->text().toInt();
         newItem.ean = eanLineEdit_->text().toStdString();
         newItem.selfLocation = selfLocationLineEdit_->text().toStdString();
-        newItem.priceNoVat = priceNoVatLineEdit_->text().toDouble();
-        newItem.vat = vatLineEdit_->text().toDouble();
-        newItem.discount = discountLineEdit_->text().toDouble();
+
+        // only relevant prices (which are saved into db and not just calculated)
+        newItem.priceNoVat = priceDSB_->value();
+        newItem.vat = vatDSB_->value();
+        newItem.discount = discountDSB_->value();
+
         newItem.description = descriptionTextEdit_->toPlainText().toStdString();
 
         if (!db_.insert(newItem)) {
@@ -137,15 +224,17 @@ void ItemEditor::save()
         if (loadedItem_->selfLocation != selfLocationLineEdit_->text().toStdString()) {
             updateItem.selfLocation = selfLocationLineEdit_->text().toStdString();
         }
-        if (loadedItem_->priceNoVat !=  priceNoVatLineEdit_->text().toDouble()) {
-            updateItem.priceNoVat = priceNoVatLineEdit_->text().toDouble();
+        // prices from doubleSpinBoxes
+        if (loadedItem_->priceNoVat !=  priceDSB_->value()) {
+            updateItem.priceNoVat = priceDSB_->value();
         }
-        if (loadedItem_->vat != vatLineEdit_->text().toDouble()) {
-            updateItem.vat = vatLineEdit_->text().toDouble();
+        if (loadedItem_->vat != vatDSB_->value()) {
+            updateItem.vat = vatDSB_->value();
         }
-        if (loadedItem_->discount != discountLineEdit_->text().toDouble()) {
-            updateItem.discount = discountLineEdit_->text().toDouble();
+        if (loadedItem_->discount != discountDSB_->value()) {
+            updateItem.discount = discountDSB_->value();
         }
+
         if (loadedItem_->description != descriptionTextEdit_->toPlainText().toStdString()) {
             updateItem.description = descriptionTextEdit_->toPlainText().toStdString();
         }

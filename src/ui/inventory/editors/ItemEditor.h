@@ -3,6 +3,7 @@
 
 #include <QLineEdit>
 #include <QTextEdit>
+#include <QDoubleSpinBox>
 
 #include "BasicEditor.h"
 #include "../../../database/DataBase.h"
@@ -21,11 +22,13 @@ private:
     QLineEdit* productNumberLineEdit_;
     QLineEdit* eanLineEdit_;
     QLineEdit* nameLineEdit_;
-    QLineEdit* priceLineEdit_;
-    QLineEdit* priceNoVatLineEdit_;
-    QLineEdit* vatLineEdit_;
-    QLineEdit* discountedPriceLineEdit_;
-    QLineEdit* discountLineEdit_;
+
+    QDoubleSpinBox* priceDSB_;
+    QDoubleSpinBox* priceNoVatDSB_;
+    QDoubleSpinBox* vatDSB_;
+    QDoubleSpinBox* discountDSB_;
+    QDoubleSpinBox* discountedPriceDSB_;
+
     QLineEdit* quantityLineEdit_;
     QLineEdit* selfLocationLineEdit_;
     QTextEdit* descriptionTextEdit_;
@@ -33,9 +36,16 @@ private:
     QLineEdit* createdLineEdit_;
 
     void initEditor();
+    void initPrices(QGridLayout& layout, int& row);
     void openItem();
 
 private slots:
+    void priceChanged();
+    void priceNoVatChanged();
+    void vatChanged();
+    void discountedPriceChanged();
+    void discountChanged();
+
     void save();
 };
 
