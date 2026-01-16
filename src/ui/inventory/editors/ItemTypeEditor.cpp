@@ -28,13 +28,13 @@ void ItemTypeEditor::initEditor()
     QGridLayout* layout = new QGridLayout();
     int row = 0;
 
-    idLE_ = UiTools::newLineEdit(*layout, "ID:", row++);
+    idLE_ = UiTools::newLineEdit("ID:", {*layout, row++});
     idLE_->setDisabled(true);    // cant be modified
 
-    typeLE_ = UiTools::newLineEdit(*layout, "Type Number:", row++);
-    nameLE_ = UiTools::newLineEdit(*layout, "Type Name:", row++, 0, 3);
-    selfLocationLE_ = UiTools::newLineEdit(*layout, "Self Location:", row);
-    quantityLE_ = UiTools::newLineEdit(*layout, "Total Quantity:", row++, 2);
+    typeLE_ = UiTools::newLineEdit("Type Number:", {*layout, row++});
+    nameLE_ = UiTools::newLineEdit("Type Name:", {*layout, row++, 0, 3});
+    selfLocationLE_ = UiTools::newLineEdit("Self Location:", {*layout, row});
+    quantityLE_ = UiTools::newLineEdit("Total Quantity:", {*layout, row++, 2});
     quantityLE_->setDisabled(true); // user cannot change it is counted from items
 
     layout->addWidget(new QLabel(""), row++, 0);
@@ -43,9 +43,9 @@ void ItemTypeEditor::initEditor()
 
     layout->addWidget(new QLabel(""), row++, 0);
 
-    lastModifiedLE_ = UiTools::newLineEdit(*layout, "Last Modified:", row);
+    lastModifiedLE_ = UiTools::newLineEdit("Last Modified:", {*layout, row});
     lastModifiedLE_->setDisabled(true);   // updates automatically
-    createdLE_ = UiTools::newLineEdit(*layout, "Created At:", row++, 2);
+    createdLE_ = UiTools::newLineEdit("Created At:", {*layout, row++, 2});
     createdLE_->setDisabled(true);        // updates automatically
 
     layout->addWidget(new QLabel(""), row++, 0);

@@ -50,6 +50,7 @@ void SettingsView::initSettings()
 
 QGridLayout* SettingsView::initPresetSettings()
 {
+    const Settings& settings = SettingsManager::getSettings();
     QGridLayout* layout = new QGridLayout();
     int row = 0;
 
@@ -57,16 +58,20 @@ QGridLayout* SettingsView::initPresetSettings()
     header->setStyleSheet("font-weight: bold; font-size: 14pt;");
     layout->addWidget(header, row++, 0, 1, 2);
 
+    vatDSB_ = UiTools::newDoubleSpinBox(
+        "Preset VAT for item", 0, 0.25, settings.presetVat, {*layout, row++});
+
     searchLayout = new QVBoxLayout();
     searchLayout->setAlignment(Qt::AlignTop);
-    layout->addLayout(searchLayout, row++, 0, 2, 2);
 
-    QSpinBox* numOfSearchFields_ = UiTools::newSpinBox(*layout, "Number of Search Fields", row++);
+    QSpinBox* numOfSearchFields_ = UiTools::newSpinBox(
+        "Number of Search Fields", 1, 4, {*layout, row++});
     connect(numOfSearchFields_, &QSpinBox::valueChanged, this, &SettingsView::updateSearch);
     // setting range here as if we declare it before connect if searchFields.size() == 1
     // updateSearch isn't being called
     numOfSearchFields_->setRange(1, 4);
-    numOfSearchFields_->setValue(SettingsManager::getSettings().searchFields.size());
+    numOfSearchFields_->setValue(settings.searchFields.size());
+    layout->addLayout(searchLayout, row++, 0, 1, 2);
 
     return layout;
 }
@@ -141,6 +146,8 @@ void SettingsView::saveSettings()
             searchField->getCaseSensitivity()
         });
     }
+
+    s.presetVat = vatDSB_->value();
 
     SettingsManager::saveSettings(s);
     emit returnMainMenu();

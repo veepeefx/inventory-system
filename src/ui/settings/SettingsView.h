@@ -26,6 +26,8 @@ private:
     QVector<QComboBox*> searchTypes;
     QVector<SearchFieldWidget*> allSearchFields;
 
+    QDoubleSpinBox* vatDSB_ = nullptr;
+
 
     void initSettings();
     QGridLayout* initOtherSettings();
