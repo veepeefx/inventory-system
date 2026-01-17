@@ -64,9 +64,6 @@ public:
 
     void applyInventorySizes() const {
         if (lineEdit_) { lineEdit_->setFixedWidth(200); }
-        if (modeComboBox_) { modeComboBox_->setFixedWidth(150); }
-        if (typeComboBox_) { typeComboBox_->setFixedWidth(100); }
-        if (caseSensitiveBox_) { caseSensitiveBox_->setFixedWidth(100); }
     }
 
 private:
