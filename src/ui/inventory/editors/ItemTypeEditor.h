@@ -28,6 +28,9 @@ private:
     void initItemList(QGridLayout& layout, int& row);
     void openItemType();
 
+    bool updateItemsItemTypeIds(int itemTypeId);
+
+
 private slots:
     void save();
 

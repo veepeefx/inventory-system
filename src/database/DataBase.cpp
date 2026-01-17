@@ -37,6 +37,9 @@ void DataBase::initTables()
     // items
     sqlite3_exec(db, Sql::Items::CREATE_TABLE, nullptr, nullptr, nullptr);
     sqlite3_exec(db, Sql::Items::CREATE_INDEX_ITEM_TYPE_ID, nullptr, nullptr, nullptr);
+
+    // setting foreign keys on
+    sqlite3_exec(db, "PRAGMA foreign_keys = ON;", nullptr, nullptr, nullptr);
 }
 
 bool DataBase::insert(const Item& item)
@@ -76,7 +79,7 @@ bool DataBase::insert(const Item& item)
     return true;
 }
 
-bool DataBase::insert(const ItemType& itemType)
+bool DataBase::insert(ItemType& itemType)
 {
     // must have name or type number in order to add
     if (itemType.name.empty() && itemType.typeNumber.empty()) {
@@ -104,6 +107,10 @@ bool DataBase::insert(const ItemType& itemType)
     }
 
     sqlite3_finalize(stmt);
+
+    // adding autoincremented id for itemtype
+    itemType.id = static_cast<int>(sqlite3_last_insert_rowid(db));
+
     return true;
 }
 
@@ -164,7 +171,7 @@ bool DataBase::update(const ItemUpdate& updateItem, int itemId,
     // if nothing to update ending update
     if (updateSql.empty()) {
         std::cerr << "Nothing to update" << std::endl;
-        return false;
+        return true;
     }
 
     sqlite3_stmt* stmt;
@@ -202,7 +209,7 @@ bool DataBase::update(const ItemTypeUpdate& updateType, int itemId,
     // if nothing to update ending update
     if (updateSql.empty()) {
         std::cerr << "Nothing to update" << std::endl;
-        return false;
+        return true;
     }
 
     sqlite3_stmt* stmt;
@@ -222,6 +229,20 @@ bool DataBase::update(const ItemTypeUpdate& updateType, int itemId,
 
     sqlite3_finalize(stmt);
     return true;
+}
+
+bool DataBase::updateItemTypes(int itemTypeId, const std::vector<int> &itemIds)
+{
+    bool allSucceeds = true;
+    for (int itemId : itemIds) {
+        ItemUpdate updatedItem;
+        updatedItem.itemTypeId = itemTypeId;
+
+        Item item = getItem(itemId);
+        allSucceeds = update(updatedItem, itemId, item.name, item.productNumber);
+    }
+
+    return allSucceeds;
 }
 
 std::vector<Item> DataBase::getItems()
@@ -303,7 +324,11 @@ int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)
         sqlite3_bind_text(stmt, index++, item.name->c_str(), -1, SQLITE_TRANSIENT);
     }
     if (item.itemTypeId) {
-        sqlite3_bind_int(stmt, index++, item.itemTypeId.value());
+        if (item.itemTypeId == -1) {
+            sqlite3_bind_null(stmt, 3);
+        } else {
+            sqlite3_bind_int(stmt, index++, item.itemTypeId.value());
+        }
     }
     if (item.productNumber) {
         sqlite3_bind_text(stmt, index++, item.productNumber->c_str(), -1, SQLITE_TRANSIENT);

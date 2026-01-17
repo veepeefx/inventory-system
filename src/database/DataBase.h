@@ -17,7 +17,7 @@ public:
     ~DataBase();
 
     bool insert(const Item& item);
-    bool insert(const ItemType& itemType);
+    bool insert(ItemType& itemType);
 
     bool remove(int id, InventoryMode mode);
 
@@ -25,6 +25,8 @@ public:
                 const std::string& orgName, const std::string& orgProdNumber);
     bool update(const ItemTypeUpdate& updateType, int typeId,
                 const std::string& orgName, const std::string& orgTypeNumber);
+
+    bool updateItemTypes(int itemTypeId, const std::vector<int> &itemIds);
 
     std::vector<Item> getItems();
     Item getItem(int id);

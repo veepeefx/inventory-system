@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QTableView>
 #include <QPushButton>
+#include <unordered_set>
 
 
 ItemTypeEditor::ItemTypeEditor(DataBase& db, const ItemType* itemType, QWidget* parent)
@@ -101,6 +102,35 @@ void ItemTypeEditor::openItemType()
     }
 }
 
+bool ItemTypeEditor::updateItemsItemTypeIds(int itemTypeId)
+{
+    const std::vector<int>& newItemIds = itemModel_->getItemIds();
+    std::unordered_set oldSet(loadedItemType_->items.begin(), loadedItemType_->items.end());
+    std::unordered_set newSet(newItemIds.begin(), newItemIds.end());
+
+    std::vector<int> removed;
+    std::vector<int> added;
+    for (int id : oldSet) {
+        if (!newSet.contains(id)) {
+            removed.push_back(id);
+        }
+    }
+    for (int id : newSet) {
+        if (!oldSet.contains(id)) {
+            added.push_back(id);
+        }
+    }
+
+    // removing itemtypeid if it was removed from itemtype
+    bool rem = db_.updateItemTypes(-1, removed);
+
+    // adding itemtypeifd if it was added to itemtype
+    bool add = db_.updateItemTypes(itemTypeId, added);
+
+    // returns true if all processes were successful
+    return rem && add;
+}
+
 void ItemTypeEditor::save()
 {
     if (loadedItemType_ == nullptr) {
@@ -109,13 +139,14 @@ void ItemTypeEditor::save()
         newItemType.typeNumber = typeLE_->text().toStdString();
         newItemType.selfLocation = selfLocationLE_->text().toStdString();
 
-        // save items new itemtypeid
-
         // save to db
         if (!db_.insert(newItemType)) {
+
             // POP UP ALERT
             return;
         }
+        // updating items with their new itemtypeid when we get the id
+        db_.updateItemTypes(newItemType.id, itemModel_->getItemIds());
 
     } else {
         ItemTypeUpdate updateItemType;
@@ -130,13 +161,13 @@ void ItemTypeEditor::save()
             updateItemType.selfLocation = selfLocationLE_->text().toStdString();
         }
 
-        // save items new itemtypeid
-
         // update to db
         if (!db_.update(updateItemType, loadedItemType_->id, loadedItemType_->name,
             loadedItemType_->typeNumber)) {
             return;
         }
+
+        updateItemsItemTypeIds(loadedItemType_->id);
     }
 
     emit updateView();
