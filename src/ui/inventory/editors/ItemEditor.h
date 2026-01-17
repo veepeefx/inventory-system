@@ -19,6 +19,7 @@ private:
     const Item *loadedItem_;
 
     QLineEdit* idLineEdit_;
+    QLineEdit* itemTypeidLineEdit_;
     QLineEdit* productNumberLineEdit_;
     QLineEdit* eanLineEdit_;
     QLineEdit* nameLineEdit_;

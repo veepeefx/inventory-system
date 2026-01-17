@@ -28,8 +28,11 @@ void ItemEditor::initEditor()
     QGridLayout *layout = new QGridLayout();
     int row = 0;
 
-    idLineEdit_ = UiTools::newLineEdit("ID:", {*layout, row++});
+    idLineEdit_ = UiTools::newLineEdit("ID:", {*layout, row});
     idLineEdit_->setDisabled(true);     // id cant be changed
+
+    itemTypeidLineEdit_ = UiTools::newLineEdit("Item Type ID:", {*layout, row++, 2});
+    itemTypeidLineEdit_->setDisabled(true);     // item type id cannot be changed straight
 
     productNumberLineEdit_ = UiTools::newLineEdit("Product Number:", {*layout, row});
     eanLineEdit_ = UiTools::newLineEdit("Ean:", {*layout, row++, 2});
@@ -96,6 +99,7 @@ void ItemEditor::openItem()
 
     // update all lineEdits in editor to correspond loaded item
     idLineEdit_->setText(QString::number(loadedItem_->id));
+    itemTypeidLineEdit_->setText(QString::number(loadedItem_->itemTypeId));
     nameLineEdit_->setText(QString::fromStdString(loadedItem_->name));
     productNumberLineEdit_->setText(QString::fromStdString(loadedItem_->productNumber));
     quantityLineEdit_->setText(QString::number(loadedItem_->quantity));
@@ -186,6 +190,7 @@ void ItemEditor::save()
     if (loadedItem_ == nullptr) {
 
         Item newItem;
+        newItem.itemTypeId = itemTypeidLineEdit_->text().toInt();
         newItem.name = nameLineEdit_->text().toStdString();
         newItem.productNumber = productNumberLineEdit_->text().toStdString();
         newItem.quantity = quantityLineEdit_->text().toInt();
@@ -209,6 +214,9 @@ void ItemEditor::save()
 
         ItemUpdate updateItem;
 
+        if (loadedItem_->itemTypeId != nameLineEdit_->text().toInt()) {
+            updateItem.itemTypeId = nameLineEdit_->text().toInt();
+        }
         if (loadedItem_->name != nameLineEdit_->text().toStdString()) {
             updateItem.name = nameLineEdit_->text().toStdString();
         }
