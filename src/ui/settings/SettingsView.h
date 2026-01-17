@@ -27,6 +27,7 @@ private:
     QVector<SearchFieldWidget*> allSearchFields;
 
     QDoubleSpinBox* vatDSB_ = nullptr;
+    QComboBox* currencyCB_;
 
 
     void initSettings();

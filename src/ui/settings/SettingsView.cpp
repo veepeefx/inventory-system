@@ -61,6 +61,9 @@ QGridLayout* SettingsView::initPresetSettings()
     vatDSB_ = UiTools::newDoubleSpinBox(
         "Preset VAT for item", 0, 1000, 2, 0.25, settings.presetVat, "%", {*layout, row++});
 
+    currencyCB_ = UiTools::newComboBox(
+        "Select preferred currency unit", CurrencySymbols, settings.currency, {*layout, row++});
+
     searchLayout = new QVBoxLayout();
     searchLayout->setAlignment(Qt::AlignTop);
 
@@ -138,8 +141,7 @@ void SettingsView::updateSearch(int val)
 void SettingsView::saveSettings()
 {
     Settings s;
-    for (int i = 0; i < allSearchFields.size(); i++) {
-        SearchFieldWidget* searchField = allSearchFields[i];
+    for (const auto& searchField : allSearchFields) {
         s.searchFields.push_back({
             searchField->getSearchMode(),
             searchField->getSearchType(),
@@ -148,6 +150,7 @@ void SettingsView::saveSettings()
     }
 
     s.presetVat = vatDSB_->value();
+    s.currency = currencyCB_->currentText();
 
     SettingsManager::saveSettings(s);
     emit returnMainMenu();

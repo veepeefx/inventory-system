@@ -21,11 +21,11 @@ public:
 
     static QSpinBox* newSpinBox(const QString &text, int min, int max, const GridInfo& info);
 
-    static QComboBox* newComboBox(QGridLayout& layout, const QString &text,
-                                  int row);
+    static QComboBox* newComboBox(const QString &text, const QStringList& items,
+                                  const QString& val, const GridInfo& info);
 
     static QDoubleSpinBox* newDoubleSpinBox(const QString &text, int min, int max, int decimals,
-                        double step, float val, const QString& prefix, const GridInfo& info);
+                        double step, double val, const QString& suffix, const GridInfo& info);
 
 
 private:

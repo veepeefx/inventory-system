@@ -31,6 +31,7 @@ struct SearchField {
 struct Settings {
     std::vector<SearchField> searchFields;
     double presetVat;
+    QString currency;
 
     QJsonObject toJson() const
     {
@@ -41,6 +42,7 @@ struct Settings {
         QJsonObject obj;
         obj["searchFields"] = arr;
         obj["presetVat"] = presetVat;
+        obj["currency"] = currency;
         return obj;
     }
 
@@ -52,6 +54,7 @@ struct Settings {
             res.searchFields.push_back(SearchField::fromJson(field.toObject()));
         }
         res.presetVat = obj["presetVat"].toDouble();
+        res.currency = obj["currency"].toString();
         return res;
     }
 };

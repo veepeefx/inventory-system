@@ -69,19 +69,19 @@ void ItemEditor::initPrices(QGridLayout &layout, int& row)
     int minVal = -999999999, maxVal = 999999999;
 
     priceDSB_ = UiTools::newDoubleSpinBox(
-        "Price:", minVal, maxVal, 2, 0.01, 0, "€", {layout, row});
+        "Price:", minVal, maxVal, 2, 0.01, 0, settings.currency, {layout, row});
 
     priceNoVatDSB_ = UiTools::newDoubleSpinBox(
-        "Price (excl. VAT):", minVal, maxVal, 2, 0.01, 0, "€", {layout, row, 2});
+        "Price (excl. VAT):", minVal, maxVal, 2, 0.01, 0, settings.currency, {layout, row, 2});
 
     vatDSB_ = UiTools::newDoubleSpinBox(
         "VAT:", 0, maxVal, 2, 0.25, settings.presetVat, "%", {layout, row++, 4});
 
     discountedPriceDSB_ = UiTools::newDoubleSpinBox(
-        "Discounted Price:", minVal, maxVal, 2, 0.01, 0, "€", {layout, row});
+        "Discounted Price:", minVal, maxVal, 2, 0.01, 0, settings.currency, {layout, row});
 
     discountDSB_ = UiTools::newDoubleSpinBox(
-        "Discount:", 0, maxVal, 2, 0.25, 0, "%", {layout, row++, 2});
+        "Discount:", 0, 100, 2, 0.25, 0, "%", {layout, row++, 2});
 
     connect(priceDSB_, &QDoubleSpinBox::valueChanged, this, &ItemEditor::priceChanged);
     connect(priceNoVatDSB_, &QDoubleSpinBox::valueChanged, this, &ItemEditor::priceNoVatChanged);

@@ -25,26 +25,29 @@ QSpinBox *UiTools::newSpinBox(const QString &text, int min, int max, const GridI
     return spinBox;
 }
 
-QComboBox *UiTools::newComboBox(QGridLayout &layout, const QString &text, int row)
+QComboBox *UiTools::newComboBox(const QString &text, const QStringList& items,
+                                const QString& val, const GridInfo& info)
 {
     QLabel* label = new QLabel(text);
     QComboBox* comboBox = new QComboBox();
+    comboBox->addItems(items);
+    comboBox->setCurrentText(val);
 
-    layout.addWidget(label, row, 0);
-    layout.addWidget(comboBox, row, 1);
+    info.layout.addWidget(label, info.row, 0);
+    info.layout.addWidget(comboBox, info.row, 1);
 
     return comboBox;
 }
 
 QDoubleSpinBox *UiTools::newDoubleSpinBox(const QString &text, int min, int max, int decimals,
-                        double step, float val, const QString& prefix, const GridInfo& info)
+                        double step, double val, const QString& suffix, const GridInfo& info)
 {
     QLabel* label = new QLabel(text);
     QDoubleSpinBox* doubleSpinBox = new QDoubleSpinBox();
     doubleSpinBox->setDecimals(decimals);
     doubleSpinBox->setRange(min, max);
     doubleSpinBox->setSingleStep(step);
-    doubleSpinBox->setSuffix(prefix);
+    doubleSpinBox->setSuffix(" " + suffix);
     doubleSpinBox->setValue(val);
 
     info.layout.addWidget(label, info.row, info.col);
