@@ -11,14 +11,18 @@
 #include "tablemodels/ItemTypeTableModel.h"
 
 
-InventoryView::InventoryView(DataBase& db, InventoryMode mode, QWidget *parent)
-: QWidget(parent), db_(db), mode_(mode)
+InventoryView::InventoryView(DataBase& db, InventoryMode mode, InventoryUse use, QWidget *parent)
+: QWidget(parent), db_(db), mode_(mode), use_(use)
 {
     mainLayout_ = new QVBoxLayout(this);
 
     initSearchBar();
     initTable();
-    initInventoryControls();
+    switch (use_) {
+        case InventoryUse::EDITING:     initEditingControls();    break;
+        case InventoryUse::SELECTING:   initSelectingControls();  break;
+    }
+    //initInventoryControls();
 }
 
 InventoryView::~InventoryView() {}
@@ -74,7 +78,7 @@ void InventoryView::initSearchBar()
     mainLayout_->addLayout(layout);
 }
 
-void InventoryView::initInventoryControls()
+void InventoryView::initEditingControls()
 {
     QHBoxLayout* controlLayout = new QHBoxLayout();
     QPushButton* addButton = new QPushButton("Add");
@@ -93,6 +97,31 @@ void InventoryView::initInventoryControls()
     controlLayout->addWidget(backButton);
 
     mainLayout_->addLayout(controlLayout);
+}
+
+void InventoryView::initSelectingControls()
+{
+    QHBoxLayout* layout = new QHBoxLayout();
+    QPushButton* selectButton = new QPushButton("Select");
+    QPushButton* cancelButton = new QPushButton("Cancel");
+
+    // currently only supported with Items
+    if (mode_ == InventoryMode::ITEM) {
+        connect(selectButton, &QPushButton::clicked, this, [this]() {
+            int itemId = model_->getId(selectedRowIndex());
+            emit selectedItem(itemId);
+            close();
+        });
+    } else {
+        selectButton->setEnabled(false);
+    }
+
+    connect(cancelButton, &QPushButton::clicked, this, &InventoryView::close);
+
+    layout->addWidget(cancelButton);
+    layout->addWidget(selectButton);
+
+    mainLayout_->addLayout(layout);
 }
 
 int InventoryView::selectedRowIndex() const

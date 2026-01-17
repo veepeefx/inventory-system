@@ -1,6 +1,10 @@
 #include "ItemTypeEditor.h"
+
+#include <iostream>
+
 #include "../tablemodels/ItemTableModel.h"
 #include "../../../utils/ui/UiTools.h"
+#include "../InventoryView.h"
 
 
 #include <QLabel>
@@ -91,6 +95,10 @@ void ItemTypeEditor::openItemType()
     quantityLE_->setText(QString::number(loadedItemType_->totalQuantity));
     lastModifiedLE_->setText(QString::fromStdString(loadedItemType_->modifiedAt));
     createdLE_->setText(QString::fromStdString(loadedItemType_->createdAt));
+
+    for (int itemId : loadedItemType_->items) {
+        itemModel_->addRow(itemId);
+    }
 }
 
 void ItemTypeEditor::save()
@@ -100,6 +108,8 @@ void ItemTypeEditor::save()
         newItemType.name = nameLE_->text().toStdString();
         newItemType.typeNumber = typeLE_->text().toStdString();
         newItemType.selfLocation = selfLocationLE_->text().toStdString();
+
+        // save items new itemtypeid
 
         // save to db
         if (!db_.insert(newItemType)) {
@@ -119,9 +129,8 @@ void ItemTypeEditor::save()
         if (loadedItemType_->selfLocation != selfLocationLE_->text().toStdString()) {
             updateItemType.selfLocation = selfLocationLE_->text().toStdString();
         }
-        if (loadedItemType_->items != itemModel_->getItemIds()) {
-            updateItemType.items = itemModel_->getItemIds();
-        }
+
+        // save items new itemtypeid
 
         // update to db
         if (!db_.update(updateItemType, loadedItemType_->id, loadedItemType_->name,
@@ -136,6 +145,17 @@ void ItemTypeEditor::save()
 
 void ItemTypeEditor::addItem()
 {
+    // open new InventoryView with selecting
+    InventoryView* inventory = new InventoryView(db_, InventoryMode::ITEM, InventoryUse::SELECTING, this);
+    inventory->setWindowModality(Qt::ApplicationModal);
+    inventory->setWindowFlags(Qt::Dialog | Qt::Popup);
+
+    // connect signal that row is selected to adding row to item model
+    connect(inventory, &InventoryView::selectedItem, this, [this](int id) {
+        itemModel_->addRow(id);
+    });
+
+    inventory->show();
 }
 
 void ItemTypeEditor::removeItem()

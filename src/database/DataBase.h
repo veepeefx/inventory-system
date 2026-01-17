@@ -27,6 +27,7 @@ public:
                 const std::string& orgName, const std::string& orgTypeNumber);
 
     std::vector<Item> getItems();
+    Item getItem(int id);
     std::vector<ItemType> getItemTypes();
 
     std::vector<Item> searchItems(const Search& search);

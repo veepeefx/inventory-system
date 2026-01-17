@@ -51,6 +51,8 @@ namespace Sql::Items {
     FROM items;
     )";
 
+    constexpr const char* GET_ITEM = "SELECT * FROM items WHERE id = ?";
+
     std::string buildDynamicUpdateSql(const ItemUpdate& item);
     std::string buildDynamicSearchSql(const Search& search,
                                       std::vector<std::string>& outBindValues);

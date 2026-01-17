@@ -239,6 +239,23 @@ std::vector<Item> DataBase::getItems()
     return items;
 }
 
+Item DataBase::getItem(int id)
+{
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, Sql::Items::GET_ITEM, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+        return {};
+    }
+
+    sqlite3_bind_int(stmt, 1, id);
+
+    std::vector<Item> item = fillItemsToVector(stmt);
+
+    sqlite3_finalize(stmt);
+    return item.front();    // returning the only element
+}
+
 std::vector<ItemType> DataBase::getItemTypes()
 {
     sqlite3_stmt *stmt;

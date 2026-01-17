@@ -46,6 +46,11 @@ enum class InventoryMode {
     ITEM_TYPE
 };
 
+enum class InventoryUse {
+    EDITING,
+    SELECTING
+};
+
 static const QStringList CurrencySymbols {
     "€", "kr", "$", "£", "¥", "₹", "₽"
 };

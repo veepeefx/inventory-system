@@ -26,10 +26,12 @@ MainWindow::~MainWindow() {}
 
 void MainWindow::initViews(DataBase& db)
 {
-    InventoryView* itemInventory = new InventoryView(db, InventoryMode::ITEM);
+    InventoryView* itemInventory = new InventoryView(
+        db, InventoryMode::ITEM, InventoryUse::EDITING, this);
     viewStack_->addWidget(itemInventory);
 
-    InventoryView* itemTypeInventory = new InventoryView(db, InventoryMode::ITEM_TYPE);
+    InventoryView* itemTypeInventory = new InventoryView(
+        db, InventoryMode::ITEM_TYPE, InventoryUse::EDITING, this);
     viewStack_->addWidget(itemTypeInventory);
 
     SettingsView* settings = new SettingsView();

@@ -18,8 +18,15 @@ public:
     void loadData() override;
     void loadData(const Search& search) override;
     int getId(int row) override;
-    Item* getItem(const int& row);
+
+    // get item with row
+    Item* getItem(int row);
+
+    // get all rows items ids in order
     std::vector<int> getItemIds() const;
+
+    // add singular row by id
+    void addRow(int itemId);
 
     int rowCount(const QModelIndex&) const override;
     int columnCount(const QModelIndex&) const override;

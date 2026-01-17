@@ -31,7 +31,7 @@ int ItemTableModel::getId(int row)
     return items_.at(row).id;
 }
 
-Item* ItemTableModel::getItem(const int &row)
+Item* ItemTableModel::getItem(int row)
 {
     if (row < 0 || row >= items_.size()) {
         return nullptr;
@@ -49,9 +49,18 @@ std::vector<int> ItemTableModel::getItemIds() const
     return vec;
 }
 
+void ItemTableModel::addRow(int itemId)
+{
+    int row = static_cast<int>(items_.size());
+
+    beginInsertRows(QModelIndex(), row, row);
+    items_.push_back(db_.getItem(itemId));
+    endInsertRows();
+}
+
 int ItemTableModel::rowCount(const QModelIndex&) const
 {
-    return items_.size();
+    return static_cast<int>(items_.size());
 }
 
 int ItemTableModel::columnCount(const QModelIndex&) const
