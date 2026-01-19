@@ -12,6 +12,8 @@
 #include <QPushButton>
 #include <unordered_set>
 
+#include "../../../utils/ui/PopUpMessage.h"
+
 
 ItemTypeEditor::ItemTypeEditor(DataBase& db, const ItemType* itemType, QWidget* parent)
     : BasicEditor(db, parent), loadedItemType_(itemType)
@@ -137,10 +139,10 @@ void ItemTypeEditor::save()
 
         // save to db
         if (!db_.insert(newItemType)) {
-
-            // POP UP ALERT
+            PopUpMessage message(PopUpCode::MISSING_INFO_ITEM_TYPE, this);
             return;
         }
+
         // updating items with their new itemtypeid when we get the id
         db_.updateItemTypes(newItemType.id, itemModel_->getItemIds());
 
@@ -160,6 +162,7 @@ void ItemTypeEditor::save()
         // update to db
         if (!db_.update(updateItemType, loadedItemType_->id, loadedItemType_->name,
             loadedItemType_->typeNumber)) {
+            PopUpMessage message(PopUpCode::MISSING_INFO_ITEM_TYPE, this);
             return;
         }
 

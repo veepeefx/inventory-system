@@ -8,6 +8,8 @@
 #include <QLabel>
 #include <QLineEdit>
 
+#include "../../../utils/ui/PopUpMessage.h"
+
 
 ItemEditor::ItemEditor(DataBase& db, const Item* item, QWidget *parent)
 : BasicEditor(db, parent), loadedItem_(item)
@@ -205,7 +207,7 @@ void ItemEditor::save()
         newItem.description = descriptionTextEdit_->toPlainText().toStdString();
 
         if (!db_.insert(newItem)) {
-            // POP UP ALERT IF BOTH NAME AND PRODUCT NUMBER IS MISSING
+            PopUpMessage message(PopUpCode::MISSING_INFO_ITEM, this);
             return;
         }
 
@@ -249,7 +251,7 @@ void ItemEditor::save()
 
         if (!db_.update(updateItem, loadedItem_->id, loadedItem_->name,
                            loadedItem_->productNumber)) {
-            // POP UP ALERT IF BOTH NAME AND PRODUCT NUMBER IS MISSING
+            PopUpMessage message(PopUpCode::MISSING_INFO_ITEM, this);
             return;
         }
     }

@@ -6,12 +6,12 @@
 #include "../../utils/ui/SearchFieldWidget.h"
 #include "../../utils/Settings.h"
 #include "../../SettingsManager.h"
+#include "../../utils/ui/PopUpMessage.h"
 
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QSpinBox>
-
 
 
 SettingsView::SettingsView(QWidget *parent) : QWidget(parent)
@@ -145,6 +145,8 @@ void SettingsView::resetSettings()
 {
     SettingsManager::resetSettings();
     emit returnMainMenu();
+
+    PopUpMessage message(PopUpCode::SETTINGS_RESTART, this);
 }
 
 void SettingsView::saveSettings()
@@ -163,4 +165,6 @@ void SettingsView::saveSettings()
 
     SettingsManager::saveSettings(s);
     emit returnMainMenu();
+
+    PopUpMessage message(PopUpCode::SETTINGS_RESTART, this);
 }
