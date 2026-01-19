@@ -6,6 +6,7 @@
 #include "tablemodels/ItemTableModel.h"
 #include "../../database/DataBase.h"
 #include "../../utils/ui/SearchFieldWidget.h"
+#include "CustomTableView.h"
 
 
 class InventoryView : public QWidget {
@@ -24,14 +25,14 @@ private:
     DataBase& db_;
 
     QVBoxLayout *mainLayout_;
-    QTableView* table_ = nullptr;
+    CustomTableView* table_ = nullptr;
     BasicTableModel* model_ = nullptr;
 
     void initTable();
     void initSearchBar();
+    void initControls();
     void initEditingControls();
     void initSelectingControls();
-    int selectedRowIndex() const;
 
     void makeSearch(const std::vector<SearchFieldWidget*>& searchFields);
 

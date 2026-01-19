@@ -18,34 +18,22 @@ InventoryView::InventoryView(DataBase& db, InventoryMode mode, InventoryUse use,
 
     initSearchBar();
     initTable();
-    switch (use_) {
-        case InventoryUse::EDITING:     initEditingControls();    break;
-        case InventoryUse::SELECTING:   initSelectingControls();  break;
-    }
-    //initInventoryControls();
+    initControls();
 }
 
 InventoryView::~InventoryView() {}
 
 void InventoryView::initTable()
 {
-    table_ = new QTableView(this);
-
-    if      (mode_ == InventoryMode::ITEM) { model_ = new ItemTableModel(db_, this); }
-    else if (mode_ == InventoryMode::ITEM_TYPE) { model_ = new ItemTypeTableModel(db_, this); }
-    else { return; }
+    switch (mode_) {
+        case InventoryMode::ITEM:       model_ = new ItemTableModel(db_, this);     break;
+        case InventoryMode::ITEM_TYPE:  model_ = new ItemTypeTableModel(db_, this); break;
+        default: return;
+    }
 
     model_->loadData();
-    table_->setModel(model_);
 
-    table_->setSelectionBehavior(QAbstractItemView::SelectRows);
-    table_->setSelectionMode(QAbstractItemView::SingleSelection);
-    table_->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
-    // removing visual focus from table
-    table_->clearSelection();
-    table_->setCurrentIndex(QModelIndex());
-
+    table_ = new CustomTableView(*model_, this);
     mainLayout_->addWidget(table_);
 }
 
@@ -76,6 +64,15 @@ void InventoryView::initSearchBar()
     });
 
     mainLayout_->addLayout(layout);
+}
+
+void InventoryView::initControls()
+{
+    // init controls which are expected for each use
+    switch (use_) {
+        case InventoryUse::EDITING:     initEditingControls();    break;
+        case InventoryUse::SELECTING:   initSelectingControls();  break;
+    }
 }
 
 void InventoryView::initEditingControls()
@@ -122,21 +119,6 @@ void InventoryView::initSelectingControls()
     mainLayout_->addLayout(layout);
 }
 
-int InventoryView::selectedRowIndex() const
-{
-    QItemSelectionModel* selection = table_->selectionModel();
-    QModelIndexList rows = selection->selectedRows();
-
-    int row;
-    if (rows.isEmpty()) {
-        row = -1;
-    } else {
-        row = rows.first().row();
-    }
-
-    return row;
-}
-
 
 void InventoryView::makeSearch(const std::vector<SearchFieldWidget*>& searchFields)
 {
@@ -165,6 +147,7 @@ void InventoryView::updateInventoryView()
 
 void InventoryView::openEditor(int row)
 {
+    // if inventory is in item mode open item editor
     if (ItemTableModel* itemModel = dynamic_cast<ItemTableModel*>(model_)) {
         const Item* item = itemModel->getItem(row);
         ItemEditor* editor = new ItemEditor(db_, item, this);
@@ -172,6 +155,7 @@ void InventoryView::openEditor(int row)
         connect(editor, &BasicEditor::updateView, this, &InventoryView::updateInventoryView);
         editor->exec();
 
+    // if inventory is in item type mode open item type editor
     } else if (ItemTypeTableModel* itemTypeModel = dynamic_cast<ItemTypeTableModel*>(model_)) {
         const ItemType* itemType = itemTypeModel->getItemType(row);
         ItemTypeEditor* editor = new ItemTypeEditor(db_, itemType, this);
@@ -183,7 +167,7 @@ void InventoryView::openEditor(int row)
 
 void InventoryView::removeButtonClicked()
 {
-    int row = selectedRowIndex();
+    int row = table_->selectedRowIndex();
     int id = model_->getId(row);
 
     // removes id if row valid (-1 incase of error)
@@ -195,13 +179,15 @@ void InventoryView::removeButtonClicked()
 
 void InventoryView::editSelected()
 {
-    int row = selectedRowIndex();
-    openEditor(row);
+    int row = table_->selectedRowIndex();
+    if (row >= 0) {
+        openEditor(row);
+    }
 }
 
 void InventoryView::selectItem()
 {
-    int row = selectedRowIndex();
+    int row = table_->selectedRowIndex();
     int itemId = model_->getId(row);
 
     emit selectedItem(itemId);

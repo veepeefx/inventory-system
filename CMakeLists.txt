@@ -38,7 +38,8 @@ add_executable(inventory-system src/main.cpp
         src/utils/ui/SearchFieldWidget.h
         src/SettingsManager.cpp
         src/SettingsManager.h
-        src/utils/Settings.h)
+        src/utils/Settings.h
+        src/ui/inventory/CustomTableView.h)
 
 include_directories(third-party)
 target_link_libraries(inventory-system PRIVATE Qt6::Widgets)

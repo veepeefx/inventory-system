@@ -1,9 +1,8 @@
 #ifndef INVENTORY_SYSTEM_ITEMTYPEEDITOR_H
 #define INVENTORY_SYSTEM_ITEMTYPEEDITOR_H
 
-#include <QTableView>
-
 #include "BasicEditor.h"
+#include "../CustomTableView.h"
 #include "../tablemodels/ItemTableModel.h"
 
 
@@ -12,10 +11,14 @@ class ItemTypeEditor : public BasicEditor {
 
 public:
     ItemTypeEditor(DataBase& db, const ItemType* itemType = nullptr, QWidget* parent = nullptr);
-    ~ItemTypeEditor();
+    ~ItemTypeEditor() = default;
 
 private:
     const ItemType* loadedItemType_;
+
+    // item type item listing
+    ItemTableModel* itemModel_ = nullptr;
+    CustomTableView* table_ = nullptr;
 
     QLineEdit* idLE_ = nullptr;
     QLineEdit* typeLE_ = nullptr;
@@ -25,15 +28,11 @@ private:
     QLineEdit* lastModifiedLE_ = nullptr;
     QLineEdit* createdLE_ = nullptr;
 
-    ItemTableModel* itemModel_ = nullptr;
-    QTableView* table_ = nullptr;
-
     void initEditor();
     void initItemList(QGridLayout& layout, int& row);
     void openItemType();
 
     bool updateItemsItemTypeIds(int itemTypeId);
-
 
 private slots:
     void save();

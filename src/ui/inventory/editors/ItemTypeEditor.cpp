@@ -25,9 +25,6 @@ ItemTypeEditor::ItemTypeEditor(DataBase& db, const ItemType* itemType, QWidget* 
     setWindowTitle("Item Type Editor");
 }
 
-ItemTypeEditor::~ItemTypeEditor()
-{}
-
 void ItemTypeEditor::initEditor()
 {
     QGridLayout* layout = new QGridLayout();
@@ -63,11 +60,8 @@ void ItemTypeEditor::initItemList(QGridLayout &layout, int& row)
     // items table
     layout.addWidget(new QLabel("Linked Items:"), row++, 0);
 
-    table_ = new QTableView(this);
-    table_->setSelectionBehavior(QAbstractItemView::SelectRows);
-
     itemModel_ = new ItemTableModel(db_, this);
-    table_->setModel(itemModel_);
+    table_ = new CustomTableView(*itemModel_, this);
 
     layout.addWidget(table_, row++, 0, 1, 4);
 
@@ -180,6 +174,7 @@ void ItemTypeEditor::addItem()
 {
     // open new InventoryView with selecting
     InventoryView* inventory = new InventoryView(db_, InventoryMode::ITEM, InventoryUse::SELECTING, this);
+    inventory->setWindowTitle("Select Item");
     inventory->setWindowModality(Qt::ApplicationModal);
     inventory->setWindowFlags(Qt::Dialog | Qt::Popup);
 
@@ -193,13 +188,6 @@ void ItemTypeEditor::addItem()
 
 void ItemTypeEditor::removeItem()
 {
-    QItemSelectionModel* selection = table_->selectionModel();
-    QModelIndexList rows = selection->selectedRows();
-
-    if (rows.isEmpty()) {
-        return;
-    }
-
-    int row = rows.first().row();
+    int row = table_->selectedRowIndex();
     itemModel_->removeRow(row);
 }
