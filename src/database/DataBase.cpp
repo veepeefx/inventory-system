@@ -325,7 +325,7 @@ int DataBase::dynamicUpdateBinding(const ItemUpdate &item, sqlite3_stmt* stmt)
     }
     if (item.itemTypeId) {
         if (item.itemTypeId == -1) {
-            sqlite3_bind_null(stmt, 3);
+            sqlite3_bind_null(stmt, index++);
         } else {
             sqlite3_bind_int(stmt, index++, item.itemTypeId.value());
         }
