@@ -88,7 +88,8 @@ void InventoryView::initEditingControls()
 
     connect(addButton, &QPushButton::clicked, this, [this]() { openEditor(); });
     connect(removeButton, &QPushButton::clicked, this, &InventoryView::removeButtonClicked);
-    connect(editButton, &QPushButton::clicked, this, &InventoryView::editButtonClicked);
+    connect(editButton, &QPushButton::clicked, this, &InventoryView::editSelected);
+    connect(table_, &QTableView::doubleClicked, this, &InventoryView::editSelected);
     connect(backButton, &QPushButton::clicked, this, [this]() { emit returnMainMenu(); });
 
     controlLayout->addWidget(addButton);
@@ -107,11 +108,8 @@ void InventoryView::initSelectingControls()
 
     // currently only supported with Items
     if (mode_ == InventoryMode::ITEM) {
-        connect(selectButton, &QPushButton::clicked, this, [this]() {
-            int itemId = model_->getId(selectedRowIndex());
-            emit selectedItem(itemId);
-            close();
-        });
+        connect(table_, &QTableView::doubleClicked, this, &InventoryView::selectItem);
+        connect(selectButton, &QPushButton::clicked, this, &InventoryView::selectItem);
     } else {
         selectButton->setEnabled(false);
     }
@@ -195,8 +193,17 @@ void InventoryView::removeButtonClicked()
     }
 }
 
-void InventoryView::editButtonClicked()
+void InventoryView::editSelected()
 {
     int row = selectedRowIndex();
     openEditor(row);
+}
+
+void InventoryView::selectItem()
+{
+    int row = selectedRowIndex();
+    int itemId = model_->getId(row);
+
+    emit selectedItem(itemId);
+    close();
 }

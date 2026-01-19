@@ -49,7 +49,10 @@ private slots:
 
     // for editing mode:
     void removeButtonClicked();
-    void editButtonClicked();
+    void editSelected();
+
+    // for selecting mode
+    void selectItem();
 };
 
 
