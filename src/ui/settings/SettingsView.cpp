@@ -94,13 +94,16 @@ QGridLayout* SettingsView::initOtherSettings()
 void SettingsView::initControls()
 {
     QPushButton* cancelButton = new QPushButton("Cancel", this);
+    QPushButton* resetButton = new QPushButton("Reset Settings", this);
     QPushButton* saveButton = new QPushButton("Save", this);
 
     connect(cancelButton, &QPushButton::clicked, this, &SettingsView::returnMainMenu);
+    connect(resetButton, &QPushButton::clicked, this, &SettingsView::resetSettings);
     connect(saveButton, &QPushButton::clicked, this, &SettingsView::saveSettings);
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(resetButton);
     buttonLayout->addWidget(saveButton);
 
     mainLayout_->addLayout(buttonLayout);
@@ -136,6 +139,12 @@ void SettingsView::updateSearch(int val)
             deleteSearchField();
         }
     }
+}
+
+void SettingsView::resetSettings()
+{
+    SettingsManager::resetSettings();
+    emit returnMainMenu();
 }
 
 void SettingsView::saveSettings()

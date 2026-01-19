@@ -41,6 +41,7 @@ private:
 private slots:
     // dynamically adjusts amount of search field settings
     void updateSearch(int val);
+    void resetSettings();
     void saveSettings();
 
 

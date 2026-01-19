@@ -29,9 +29,12 @@ struct SearchField {
 };
 
 struct Settings {
-    std::vector<SearchField> searchFields;
-    double presetVat;
-    QString currency;
+    std::vector<SearchField> searchFields = {
+        {SearchMode::NAME, SearchType::STARTS_WITH, false},
+        {SearchMode::PRODUCT_NUMBER, SearchType::STARTS_WITH, false}
+    };
+    double presetVat = 25.5;
+    QString currency = CurrencySymbols.first();
 
     QJsonObject toJson() const
     {
@@ -48,13 +51,22 @@ struct Settings {
 
     static Settings fromJson(const QJsonObject& obj)
     {
+        // starts from presets so if some value is missing uses preset
         Settings res;
-        QJsonArray arr = obj["searchFields"].toArray();
-        for (const auto& field : arr) {
-            res.searchFields.push_back(SearchField::fromJson(field.toObject()));
+        if (obj.contains("searchFields") && obj["searchFields"].isArray()) {
+            res.searchFields.clear();
+            QJsonArray arr = obj["searchFields"].toArray();
+            for (const auto& field : arr) {
+                res.searchFields.push_back(SearchField::fromJson(field.toObject()));
+            }
         }
-        res.presetVat = obj["presetVat"].toDouble();
-        res.currency = obj["currency"].toString();
+        if (obj.contains("presetVat") && obj["presetVat"].isDouble()) {
+            res.presetVat = obj["presetVat"].toDouble();
+        }
+        if (obj.contains("currency") && obj["currency"].isString()) {
+            res.currency = obj["currency"].toString();
+        }
+
         return res;
     }
 };

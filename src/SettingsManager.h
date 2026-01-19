@@ -12,9 +12,6 @@ public:
     static void resetSettings();
 
 private:
-
-    static Settings defaultSettings();
-
     SettingsManager() = delete;
     ~SettingsManager() = delete;
 };

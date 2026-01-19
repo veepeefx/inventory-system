@@ -23,7 +23,6 @@ bool SettingsManager::loadSettings()
 {
     QFile file(SETTINGS_FILE_PATH);
     if (!file.open(QIODevice::ReadOnly)) {
-        std::cerr << "MAKING FILE";
         resetSettings();
         return false;
     }
@@ -46,17 +45,6 @@ const Settings& SettingsManager::getSettings()
 
 void SettingsManager::resetSettings()
 {
-    settings_ = defaultSettings();
+    settings_ = Settings();
     saveSettings(settings_);
-}
-
-Settings SettingsManager::defaultSettings()
-{
-    Settings s;
-
-    s.searchFields.push_back({SearchMode::NAME, SearchType::STARTS_WITH, false});
-    s.searchFields.push_back({SearchMode::PRODUCT_NUMBER, SearchType::STARTS_WITH, false});
-    s.presetVat = 25.5;
-
-    return s;
 }
