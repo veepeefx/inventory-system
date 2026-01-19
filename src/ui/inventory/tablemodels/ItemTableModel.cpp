@@ -22,6 +22,19 @@ void ItemTableModel::loadData(const Search& search)
     endResetModel();
 }
 
+bool ItemTableModel::removeRows(int row, int count, const QModelIndex& parent)
+{
+    if (row < 0 || count <= 0 || row + count > items_.size()) {
+        return false;
+    }
+
+    beginRemoveRows(parent, row, row + count - 1);
+    items_.erase(items_.begin() + row, items_.begin() + row + count);
+    endRemoveRows();
+
+    return true;
+}
+
 int ItemTableModel::getId(int row)
 {
     if (row < 0 || row >= items_.size()) {

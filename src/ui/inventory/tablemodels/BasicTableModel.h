@@ -13,6 +13,9 @@ public:
     virtual void loadData() = 0;
     virtual void loadData(const Search& search) = 0;
 
+    // removes singular row
+    virtual bool removeRows(int row, int count, const QModelIndex& parent) = 0;
+
     // function returns -1 if row is out of index
     virtual int getId(int row) = 0;
 

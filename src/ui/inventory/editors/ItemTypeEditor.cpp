@@ -63,11 +63,13 @@ void ItemTypeEditor::initItemList(QGridLayout &layout, int& row)
     // items table
     layout.addWidget(new QLabel("Linked Items:"), row++, 0);
 
-    QTableView* table = new QTableView(this);
-    itemModel_ = new ItemTableModel(db_, this);
-    table->setModel(itemModel_);
+    table_ = new QTableView(this);
+    table_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    layout.addWidget(table, row++, 0, 1, 4);
+    itemModel_ = new ItemTableModel(db_, this);
+    table_->setModel(itemModel_);
+
+    layout.addWidget(table_, row++, 0, 1, 4);
 
     // controls
     QHBoxLayout* tableControlLayout = new QHBoxLayout();
@@ -191,4 +193,13 @@ void ItemTypeEditor::addItem()
 
 void ItemTypeEditor::removeItem()
 {
+    QItemSelectionModel* selection = table_->selectionModel();
+    QModelIndexList rows = selection->selectedRows();
+
+    if (rows.isEmpty()) {
+        return;
+    }
+
+    int row = rows.first().row();
+    itemModel_->removeRow(row);
 }

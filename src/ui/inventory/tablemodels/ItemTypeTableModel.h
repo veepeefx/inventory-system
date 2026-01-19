@@ -18,7 +18,9 @@ public:
 
     void loadData() override;
     void loadData(const Search& search) override;
+    bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
     int getId(int row) override;
+
     ItemType* getItemType(const int& row);
 
     int rowCount(const QModelIndex&) const override;

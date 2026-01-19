@@ -23,6 +23,19 @@ void ItemTypeTableModel::loadData(const Search& search)
     endResetModel();
 }
 
+bool ItemTypeTableModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    if (row < 0 || count <= 0 || row + count > itemTypes_.size()) {
+        return false;
+    }
+
+    beginRemoveRows(parent, row, row + count - 1);
+    itemTypes_.erase(itemTypes_.begin() + row, itemTypes_.begin() + row + count);
+    endRemoveRows();
+
+    return true;
+}
+
 int ItemTypeTableModel::getId(int row)
 {
     if (row < 0 || row >= itemTypes_.size()) {

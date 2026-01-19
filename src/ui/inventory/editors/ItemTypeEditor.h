@@ -1,6 +1,8 @@
 #ifndef INVENTORY_SYSTEM_ITEMTYPEEDITOR_H
 #define INVENTORY_SYSTEM_ITEMTYPEEDITOR_H
 
+#include <QTableView>
+
 #include "BasicEditor.h"
 #include "../tablemodels/ItemTableModel.h"
 
@@ -22,7 +24,9 @@ private:
     QLineEdit* quantityLE_ = nullptr;
     QLineEdit* lastModifiedLE_ = nullptr;
     QLineEdit* createdLE_ = nullptr;
+
     ItemTableModel* itemModel_ = nullptr;
+    QTableView* table_ = nullptr;
 
     void initEditor();
     void initItemList(QGridLayout& layout, int& row);
