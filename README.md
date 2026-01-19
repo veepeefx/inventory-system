@@ -3,17 +3,20 @@
 ## Description
 Inventory Management System implemented in C++ using SQLite3 as the database backend. The system 
 allows users to efficiently keep track of items stored in an inventory, including adding, updating,
-viewing, and removing items. The application is designed as a lightweight, local solution that does
-not require a separate database server, making it suitable for small businesses, personal projects,
-or educational purposes.
+viewing, and removing items or item types. The application is designed as a lightweight, local solution
+that does not require a separate database server, making it suitable for small businesses, personal 
+projects, or educational purposes.
 
 ## Features
 - Item database for small inventory
+- Item types to group items
+- Settings to modify presets
 - Simple and clean Qt-based user interface
 
 #### Future additions
-- Item types to group items
-- Settings to modify presets
+- Adding item providers
+- Selling and buying of items
+- Stocktaking mode
 
 ## Disclaimer
 This software is provided as open source and “as is”, without any guarantees regarding data safety,
