@@ -59,7 +59,10 @@ bool DataBase::insert(const Item& item)
 
     int index = 1;
     sqlite3_bind_text(stmt, index++, item.name.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_int(stmt, index++, item.itemTypeId);
+
+    if (item.itemTypeId == -1) { sqlite3_bind_null(stmt, index++); }
+    else { sqlite3_bind_int(stmt, index++, item.itemTypeId); }
+
     sqlite3_bind_text(stmt, index++, item.productNumber.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, index++, item.quantity);
     sqlite3_bind_text(stmt, index++, item.ean.c_str(), -1, SQLITE_TRANSIENT);

@@ -192,7 +192,8 @@ void ItemEditor::save()
     if (loadedItem_ == nullptr) {
 
         Item newItem;
-        newItem.itemTypeId = itemTypeidLineEdit_->text().toInt();
+        if (itemTypeidLineEdit_->text().isEmpty()) { newItem.itemTypeId = -1; }
+        else { newItem.itemTypeId = itemTypeidLineEdit_->text().toInt(); }
         newItem.name = nameLineEdit_->text().toStdString();
         newItem.productNumber = productNumberLineEdit_->text().toStdString();
         newItem.quantity = quantityLineEdit_->text().toInt();
