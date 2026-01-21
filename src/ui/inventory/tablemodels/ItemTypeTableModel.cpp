@@ -8,18 +8,17 @@ ItemTypeTableModel::ItemTypeTableModel(DataBase& db, QWidget *parent)
 
 ItemTypeTableModel::~ItemTypeTableModel() {}
 
-void ItemTypeTableModel::loadData()
-{
-    beginResetModel();
-    itemTypes_ = db_.getItemTypes();
-    endResetModel();
-}
-
 void ItemTypeTableModel::loadData(const Search& search)
 {
     beginResetModel();
-    // NO SEARCH FUNCTIONALITY FOR ITEM TYPES YET
-    itemTypes_ = db_.getItemTypes();
+
+    // if given search terms are empty we handle it like without search
+    if (search.empty()) {
+        itemTypes_ = db_.getItemTypes();
+    } else {
+        itemTypes_ = db_.getItemTypes();    // MISSING SEARCH FUNCTIONALITY
+    }
+
     endResetModel();
 }
 

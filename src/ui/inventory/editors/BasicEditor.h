@@ -29,7 +29,7 @@ private slots:
 
 signals:
     void saveData();
-    void updateView();
+    void reloadView();
 
 };
 

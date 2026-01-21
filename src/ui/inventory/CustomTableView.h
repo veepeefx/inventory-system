@@ -7,30 +7,28 @@
 class CustomTableView : public QTableView {
     Q_OBJECT
 public:
-    CustomTableView(BasicTableModel& model, QWidget* parent) : QTableView(parent)
+    CustomTableView(QWidget* parent) : QTableView(parent)
     {
         setSelectionBehavior(QAbstractItemView::SelectRows);
         setSelectionMode(QAbstractItemView::SingleSelection);
         setEditTriggers(QAbstractItemView::NoEditTriggers);
+    }
 
+    void setModel(BasicTableModel& model)
+    {
         QTableView::setModel(&model);
     }
 
     int selectedRowIndex() const
     {
-        QItemSelectionModel* selection = this->selectionModel();
-        QModelIndexList rows = selection->selectedRows();
-
-        int row;
-        if (rows.isEmpty()) {
-            row = -1;
-        } else {
-            row = rows.first().row();
+        if (QItemSelectionModel* selection = this->selectionModel()) {
+            QModelIndexList rows = selection->selectedRows();
+            if (!rows.isEmpty()) {
+                return rows.first().row();
+            }
         }
-
-        return row;
+        return -1;
     }
-private:
 };
 
 #endif //INVENTORY_SYSTEM_BASICTABLEVIEW_H

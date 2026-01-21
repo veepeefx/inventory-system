@@ -10,8 +10,7 @@ public:
     explicit BasicTableModel(DataBase& db, QObject* parent = nullptr)
     : QAbstractTableModel(parent), db_(db) {}
 
-    virtual void loadData() = 0;
-    virtual void loadData(const Search& search) = 0;
+    virtual void loadData(const Search& search = {}) = 0;
 
     // removes singular row
     virtual bool removeRows(int row, int count, const QModelIndex& parent) = 0;

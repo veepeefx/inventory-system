@@ -257,6 +257,6 @@ void ItemEditor::save()
         }
     }
 
-    emit updateView();
+    emit reloadView();
     accept();
 }

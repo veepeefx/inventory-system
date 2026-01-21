@@ -16,8 +16,7 @@ public:
     explicit ItemTypeTableModel(DataBase& db, QWidget *parent = nullptr);
     ~ItemTypeTableModel() override;
 
-    void loadData() override;
-    void loadData(const Search& search) override;
+    void loadData(const Search& search = {}) override;
     bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
     int getId(int row) override;
 

@@ -38,6 +38,8 @@ struct Search {
     std::vector<SearchMode> modes;
     std::vector<SearchType> types;
     std::vector<bool> caseSensitivity;
+
+    bool empty() const { return terms.empty(); }
 };
 
 // INVENTORY STATES

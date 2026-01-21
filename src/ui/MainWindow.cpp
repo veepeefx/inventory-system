@@ -3,6 +3,8 @@
 #include <QPushButton>
 
 #include "inventory/InventoryView.h"
+#include "inventory/ItemTypeView.h"
+#include "inventory/ItemView.h"
 #include "settings/SettingsView.h"
 
 MainWindow::MainWindow(DataBase& db, QWidget *parent)
@@ -26,12 +28,10 @@ MainWindow::~MainWindow() {}
 
 void MainWindow::initViews(DataBase& db)
 {
-    InventoryView* itemInventory = new InventoryView(
-        db, InventoryMode::ITEM, InventoryUse::EDITING, this);
+    ItemView* itemInventory = new ItemView(db, InventoryUse::EDITING, this);
     viewStack_->addWidget(itemInventory);
 
-    InventoryView* itemTypeInventory = new InventoryView(
-        db, InventoryMode::ITEM_TYPE, InventoryUse::EDITING, this);
+    ItemTypeView* itemTypeInventory = new ItemTypeView(db, InventoryUse::EDITING, this);
     viewStack_->addWidget(itemTypeInventory);
 
     SettingsView* settings = new SettingsView();

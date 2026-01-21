@@ -13,6 +13,7 @@
 #include <QPushButton>
 #include <unordered_set>
 
+#include "../ItemView.h"
 #include "../../../utils/ui/PopUpMessage.h"
 
 
@@ -64,7 +65,8 @@ void ItemTypeEditor::initItemList(QGridLayout &layout, int& row)
     layout.addWidget(new QLabel("Linked Items:"), row++, 0);
 
     itemModel_ = new ItemTableModel(db_, this);
-    table_ = new CustomTableView(*itemModel_, this);
+    table_ = new CustomTableView(this);
+    table_->setModel(*itemModel_);
 
     layout.addWidget(table_, row++, 0, 1, 4);
 
@@ -170,20 +172,21 @@ void ItemTypeEditor::save()
         updateItemsItemTypeIds(loadedItemType_->id);
     }
 
-    emit updateView();
+    emit reloadView();
     accept();
 }
 
 void ItemTypeEditor::addItem()
 {
-    // open new InventoryView with selecting
-    InventoryView* inventory = new InventoryView(db_, InventoryMode::ITEM, InventoryUse::SELECTING, this);
+    // open new with selecting
+    ItemView* inventory = new ItemView(db_, InventoryUse::SELECTING, this);
+
     inventory->setWindowTitle("Select Item");
     inventory->setWindowModality(Qt::ApplicationModal);
     inventory->setWindowFlags(Qt::Dialog | Qt::Popup);
 
     // connect signal that row is selected to adding row to item model
-    connect(inventory, &InventoryView::selectedItem, this, [this](int id) {
+    connect(inventory, &InventoryView::selectedId, this, [this](int id) {
         // add if not already in
         const std::vector<int>& v = itemModel_->getItemIds();
         if (std::ranges::find(v, id) == v.end()) {

@@ -8,17 +8,17 @@ ItemTableModel::ItemTableModel(DataBase& db, QWidget *parent)
 
 ItemTableModel::~ItemTableModel() {}
 
-void ItemTableModel::loadData()
-{
-    beginResetModel();
-    items_ = db_.getItems();
-    endResetModel();
-}
-
 void ItemTableModel::loadData(const Search& search)
 {
     beginResetModel();
-    items_ = db_.searchItems(search);
+
+    // if given search terms are empty we handle it like without search
+    if (search.empty()) {
+        items_ = db_.getItems();
+    } else {
+        items_ = db_.searchItems(search);
+    }
+
     endResetModel();
 }
 

@@ -40,7 +40,11 @@ add_executable(inventory-system src/main.cpp
         src/SettingsManager.h
         src/utils/Settings.h
         src/ui/inventory/CustomTableView.h
-        src/utils/ui/PopUpMessage.h)
+        src/utils/ui/PopUpMessage.h
+        src/ui/inventory/ItemView.cpp
+        src/ui/inventory/ItemView.h
+        src/ui/inventory/ItemTypeView.cpp
+        src/ui/inventory/ItemTypeView.h)
 
 include_directories(third-party)
 target_link_libraries(inventory-system PRIVATE Qt6::Widgets)

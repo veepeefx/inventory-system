@@ -5,38 +5,26 @@
 #include <QVBoxLayout>
 
 #include "../../SettingsManager.h"
-#include "../../utils/ui/PopUpMessage.h"
 #include "../../utils/ui/SearchFieldWidget.h"
 #include "editors/ItemEditor.h"
 #include "editors/ItemTypeEditor.h"
 #include "tablemodels/ItemTypeTableModel.h"
 
 
-InventoryView::InventoryView(DataBase& db, InventoryMode mode, InventoryUse use, QWidget *parent)
-: QWidget(parent), db_(db), mode_(mode), use_(use)
+InventoryView::InventoryView(DataBase& db, InventoryUse use, QWidget *parent)
+: QWidget(parent), db_(db), use_(use)
 {
     mainLayout_ = new QVBoxLayout(this);
 
     initSearchBar();
-    initTable();
+
+    table_ = new CustomTableView(this);
+    mainLayout_->addWidget(table_);
+
     initControls();
 }
 
 InventoryView::~InventoryView() {}
-
-void InventoryView::initTable()
-{
-    switch (mode_) {
-        case InventoryMode::ITEM:       model_ = new ItemTableModel(db_, this);     break;
-        case InventoryMode::ITEM_TYPE:  model_ = new ItemTypeTableModel(db_, this); break;
-        default: return;
-    }
-
-    model_->loadData();
-
-    table_ = new CustomTableView(*model_, this);
-    mainLayout_->addWidget(table_);
-}
 
 void InventoryView::initSearchBar()
 {
@@ -104,14 +92,8 @@ void InventoryView::initSelectingControls()
     QPushButton* selectButton = new QPushButton("Select");
     QPushButton* cancelButton = new QPushButton("Cancel");
 
-    // currently only supported with Items
-    if (mode_ == InventoryMode::ITEM) {
-        connect(table_, &QTableView::doubleClicked, this, &InventoryView::selectItem);
-        connect(selectButton, &QPushButton::clicked, this, &InventoryView::selectItem);
-    } else {
-        selectButton->setEnabled(false);
-    }
-
+    connect(table_, &QTableView::doubleClicked, this, &InventoryView::select);
+    connect(selectButton, &QPushButton::clicked, this, &InventoryView::select);
     connect(cancelButton, &QPushButton::clicked, this, &InventoryView::close);
 
     layout->addWidget(cancelButton);
@@ -120,8 +102,7 @@ void InventoryView::initSelectingControls()
     mainLayout_->addLayout(layout);
 }
 
-
-void InventoryView::makeSearch(const std::vector<SearchFieldWidget*>& searchFields)
+Search InventoryView::getSearch(const std::vector<SearchFieldWidget*>& searchFields)
 {
     Search search;
     for (const auto& sf : searchFields) {
@@ -136,69 +117,15 @@ void InventoryView::makeSearch(const std::vector<SearchFieldWidget*>& searchFiel
         }
     }
 
-    // make fill with all data or with search data
-    if (search.terms.empty()) { model_->loadData(); }
-    else { model_->loadData(search); }
-}
-
-void InventoryView::updateInventoryView()
-{
-    model_->loadData();
-}
-
-void InventoryView::openEditor(int row)
-{
-    // if inventory is in item mode open item editor
-    if (ItemTableModel* itemModel = dynamic_cast<ItemTableModel*>(model_)) {
-        const Item* item = itemModel->getItem(row);
-        ItemEditor* editor = new ItemEditor(db_, item, this);
-
-        connect(editor, &BasicEditor::updateView, this, &InventoryView::updateInventoryView);
-        editor->exec();
-
-    // if inventory is in item type mode open item type editor
-    } else if (ItemTypeTableModel* itemTypeModel = dynamic_cast<ItemTypeTableModel*>(model_)) {
-        const ItemType* itemType = itemTypeModel->getItemType(row);
-        ItemTypeEditor* editor = new ItemTypeEditor(db_, itemType, this);
-
-        connect(editor, &BasicEditor::updateView, this, &InventoryView::updateInventoryView);
-        editor->exec();
-    }
-}
-
-void InventoryView::removeButtonClicked()
-{
-    int row = table_->selectedRowIndex();
-    int id = model_->getId(row);
-
-    // removes id if row valid (-1 incase of error)
-    if (id >= 0) {
-        db_.remove(id, mode_);
-        updateInventoryView();
-    }
+    return search;
 }
 
 void InventoryView::editSelected()
 {
     int row = table_->selectedRowIndex();
+
+    // edit button only works if something is selected
     if (row >= 0) {
         openEditor(row);
-    }
-}
-
-void InventoryView::selectItem()
-{
-    int row = table_->selectedRowIndex();
-
-    if (ItemTableModel* itemModel = dynamic_cast<ItemTableModel*>(model_)) {
-        const Item* item = itemModel->getItem(row);
-
-        if (item->itemTypeId) {
-            bool move = PopUpMessage::confirm(PopUpCode::ITEM_HAS_ITEM_TYPE, this);
-            if (!move) { return; }
-        }
-
-        emit selectedItem(item->id);
-        close();
     }
 }
