@@ -46,25 +46,58 @@ void MainWindow::initViews(DataBase& db)
 
 void MainWindow::initMainMenu()
 {
+    int column = 0;
     QPushButton* itemsButton = new QPushButton("Items");
     QPushButton* itemTypeButton = new QPushButton("Item Types");
-    QPushButton* settingsButton = new QPushButton("Settings");
-    QPushButton* exitButton = new QPushButton("Exit");
-
-    itemsButton->setFixedSize(BUTTON_SIZE);
-    itemTypeButton->setFixedSize(BUTTON_SIZE);
-    settingsButton->setFixedSize(BUTTON_SIZE);
-    exitButton->setFixedSize(BUTTON_SIZE);
-
+    QPushButton* suppliersButton = new QPushButton("Suppliers");
     connect(itemsButton, &QPushButton::clicked, this, &MainWindow::onItemsButtonClicked);
     connect(itemTypeButton, &QPushButton::clicked, this, &MainWindow::onItemTypeButtonClicked);
+    suppliersButton->setEnabled(false);
+    suppliersButton->setToolTip("Future feature...");
+    mainLayout_->addWidget(itemsButton, 0, column);
+    mainLayout_->addWidget(itemTypeButton, 1, column);
+    mainLayout_->addWidget(suppliersButton, 2, column);
+    column++;
+
+/*  FOR FUTURE FEATURES
+    QPushButton* createPurchase = new QPushButton("Create Purchase");
+    QPushButton* pastPurchase = new QPushButton("Past Purchases");
+    QPushButton* pendingPurchase = new QPushButton("Pending Purchases");
+
+    mainLayout_->addWidget(createPurchase, 0, column);
+    mainLayout_->addWidget(pastPurchase, 1, column);
+    mainLayout_->addWidget(pendingPurchase, 2, column);
+    column++;
+
+    QPushButton* createSale = new QPushButton("Create Sale");
+    QPushButton* pastSales = new QPushButton("Past Sales");
+    QPushButton* pendingSales = new QPushButton("Pending Sales");
+
+    mainLayout_->addWidget(createSale, 0, column);
+    mainLayout_->addWidget(pastSales, 1, column);
+    mainLayout_->addWidget(pendingSales, 2, column);
+    column++;
+*/
+
+    QPushButton* stocktakingButton = new QPushButton("Stocktaking");
+    QPushButton* settingsButton = new QPushButton("Settings");
+    QPushButton* exitButton = new QPushButton("Exit");
+    stocktakingButton->setEnabled(false);
+    stocktakingButton->setToolTip("Future feature...");
     connect(settingsButton, &QPushButton::clicked, this, &MainWindow::onSettingsButtonClicked);
     connect(exitButton, &QPushButton::clicked, this, &MainWindow::onExitButtonClicked);
+    mainLayout_->addWidget(stocktakingButton, 0, column);
+    mainLayout_->addWidget(settingsButton, 1, column);
+    mainLayout_->addWidget(exitButton, 2, column);
 
-    mainLayout_->addWidget(itemsButton, 1, 1);
-    mainLayout_->addWidget(itemTypeButton, 2, 1);
-    mainLayout_->addWidget(settingsButton, 3, 1);
-    mainLayout_->addWidget(exitButton, 4, 1);
+    // set all buttons to size
+    for (int i = 0; i < mainLayout_->count(); ++i) {
+        if (QWidget* widget = mainLayout_->itemAt(i)->widget()) {
+            if (QPushButton* button = qobject_cast<QPushButton*>(widget)) {
+                button->setFixedSize(BUTTON_SIZE);
+            }
+        }
+    }
 }
 
 void MainWindow::onItemsButtonClicked()
