@@ -31,15 +31,15 @@ DataBase::~DataBase()
 
 void DataBase::initTables()
 {
+    // setting foreign keys on
+    sqlite3_exec(db, "PRAGMA foreign_keys = ON;", nullptr, nullptr, nullptr);
+
     // item types
     sqlite3_exec(db, Sql::ItemTypes::CREATE_TABLE, nullptr, nullptr, nullptr);
 
     // items
     sqlite3_exec(db, Sql::Items::CREATE_TABLE, nullptr, nullptr, nullptr);
     sqlite3_exec(db, Sql::Items::CREATE_INDEX_ITEM_TYPE_ID, nullptr, nullptr, nullptr);
-
-    // setting foreign keys on
-    sqlite3_exec(db, "PRAGMA foreign_keys = ON;", nullptr, nullptr, nullptr);
 }
 
 bool DataBase::insert(const Item& item)
