@@ -216,8 +216,8 @@ void ItemEditor::save()
 
         ItemUpdate updateItem;
 
-        if (loadedItem_->itemTypeId != nameLineEdit_->text().toInt()) {
-            updateItem.itemTypeId = nameLineEdit_->text().toInt();
+        if (loadedItem_->itemTypeId != itemTypeidLineEdit_->text().toInt()) {
+            updateItem.itemTypeId = itemTypeidLineEdit_->text().toInt();
         }
         if (loadedItem_->name != nameLineEdit_->text().toStdString()) {
             updateItem.name = nameLineEdit_->text().toStdString();
