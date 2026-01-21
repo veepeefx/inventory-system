@@ -5,21 +5,37 @@
 enum class PopUpCode {
     SETTINGS_RESTART,
     MISSING_INFO_ITEM,
-    MISSING_INFO_ITEM_TYPE
+    MISSING_INFO_ITEM_TYPE,
+    ITEM_HAS_ITEM_TYPE
 };
 
-class PopUpMessage : public QMessageBox {
-    Q_OBJECT
+class PopUpMessage {
 public:
-    PopUpMessage(PopUpCode code, QWidget* parent = nullptr) : QMessageBox(parent)
-    {
-        QString msg = popUpCodeToKey(code);
-        QMessageBox::information(parent, "Information", msg, QMessageBox::Ok);
+    static void info(PopUpCode code, QWidget* parent = nullptr) {
+        QMessageBox msg(parent);
+        msg.setWindowTitle("Information");
+        msg.setText(popUpCodeToKey(code));
+        msg.setIcon(QMessageBox::Information);
+        msg.setStandardButtons(QMessageBox::Ok);
+        msg.exec();
+    }
+
+    static bool confirm(PopUpCode code, QWidget* parent = nullptr) {
+        QMessageBox msg(parent);
+        msg.setWindowTitle("Confirm");
+        msg.setText(popUpCodeToKey(code));
+        msg.setIcon(QMessageBox::Question);
+        msg.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msg.setDefaultButton(QMessageBox::Ok);
+
+        msg.exec();
+        return msg.clickedButton()
+            && msg.standardButton(msg.clickedButton()) == QMessageBox::Ok;
     }
 
 private:
 
-    QString popUpCodeToKey(PopUpCode code)
+    static QString popUpCodeToKey(PopUpCode code)
     {
         switch (code) {
             case PopUpCode::SETTINGS_RESTART:
@@ -33,6 +49,10 @@ private:
             case PopUpCode::MISSING_INFO_ITEM_TYPE:
                 return "Cannot save item type:\n"
                        "At least a name or a type number is required.";
+
+            case PopUpCode::ITEM_HAS_ITEM_TYPE:
+                return "This item already has item type!\n"
+                       "Are you sure you want to add it?";
 
             default: return "Missing pop up message";
         }

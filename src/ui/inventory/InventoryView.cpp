@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 
 #include "../../SettingsManager.h"
+#include "../../utils/ui/PopUpMessage.h"
 #include "../../utils/ui/SearchFieldWidget.h"
 #include "editors/ItemEditor.h"
 #include "editors/ItemTypeEditor.h"
@@ -188,8 +189,16 @@ void InventoryView::editSelected()
 void InventoryView::selectItem()
 {
     int row = table_->selectedRowIndex();
-    int itemId = model_->getId(row);
 
-    emit selectedItem(itemId);
-    close();
+    if (ItemTableModel* itemModel = dynamic_cast<ItemTableModel*>(model_)) {
+        const Item* item = itemModel->getItem(row);
+
+        if (item->itemTypeId) {
+            bool move = PopUpMessage::confirm(PopUpCode::ITEM_HAS_ITEM_TYPE, this);
+            if (!move) { return; }
+        }
+
+        emit selectedItem(item->id);
+        close();
+    }
 }

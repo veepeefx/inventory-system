@@ -1,6 +1,7 @@
 #include "ItemTypeEditor.h"
 
 #include <iostream>
+#include <ranges>
 
 #include "../tablemodels/ItemTableModel.h"
 #include "../../../utils/ui/UiTools.h"
@@ -139,7 +140,7 @@ void ItemTypeEditor::save()
 
         // save to db
         if (!db_.insert(newItemType)) {
-            PopUpMessage message(PopUpCode::MISSING_INFO_ITEM_TYPE, this);
+            PopUpMessage::info(PopUpCode::MISSING_INFO_ITEM_TYPE, this);
             return;
         }
 
@@ -162,7 +163,7 @@ void ItemTypeEditor::save()
         // update to db
         if (!db_.update(updateItemType, loadedItemType_->id, loadedItemType_->name,
             loadedItemType_->typeNumber)) {
-            PopUpMessage message(PopUpCode::MISSING_INFO_ITEM_TYPE, this);
+            PopUpMessage::info(PopUpCode::MISSING_INFO_ITEM_TYPE, this);
             return;
         }
 
@@ -183,7 +184,11 @@ void ItemTypeEditor::addItem()
 
     // connect signal that row is selected to adding row to item model
     connect(inventory, &InventoryView::selectedItem, this, [this](int id) {
-        itemModel_->addRow(id);
+        // add if not already in
+        const std::vector<int>& v = itemModel_->getItemIds();
+        if (std::ranges::find(v, id) == v.end()) {
+            itemModel_->addRow(id);
+        }
     });
 
     inventory->show();

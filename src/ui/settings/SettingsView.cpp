@@ -146,7 +146,7 @@ void SettingsView::resetSettings()
     SettingsManager::resetSettings();
     emit returnMainMenu();
 
-    PopUpMessage message(PopUpCode::SETTINGS_RESTART, this);
+    PopUpMessage::info(PopUpCode::SETTINGS_RESTART, this);
 }
 
 void SettingsView::saveSettings()
@@ -166,5 +166,5 @@ void SettingsView::saveSettings()
     SettingsManager::saveSettings(s);
     emit returnMainMenu();
 
-    PopUpMessage message(PopUpCode::SETTINGS_RESTART, this);
+    PopUpMessage::info(PopUpCode::SETTINGS_RESTART, this);
 }

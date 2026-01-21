@@ -207,7 +207,7 @@ void ItemEditor::save()
         newItem.description = descriptionTextEdit_->toPlainText().toStdString();
 
         if (!db_.insert(newItem)) {
-            PopUpMessage message(PopUpCode::MISSING_INFO_ITEM, this);
+            PopUpMessage::info(PopUpCode::MISSING_INFO_ITEM, this);
             return;
         }
 
@@ -251,7 +251,7 @@ void ItemEditor::save()
 
         if (!db_.update(updateItem, loadedItem_->id, loadedItem_->name,
                            loadedItem_->productNumber)) {
-            PopUpMessage message(PopUpCode::MISSING_INFO_ITEM, this);
+            PopUpMessage::info(PopUpCode::MISSING_INFO_ITEM, this);
             return;
         }
     }
