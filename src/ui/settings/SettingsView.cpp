@@ -152,6 +152,7 @@ void SettingsView::resetSettings()
 void SettingsView::saveSettings()
 {
     Settings s;
+    s.searchFields.clear();
     for (const auto& searchField : allSearchFields) {
         s.searchFields.push_back({
             searchField->getSearchMode(),
