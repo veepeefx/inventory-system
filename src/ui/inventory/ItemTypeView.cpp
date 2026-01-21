@@ -1,4 +1,6 @@
 #include "ItemTypeView.h"
+
+#include "../../utils/ui/PopUpMessage.h"
 #include "editors/ItemTypeEditor.h"
 
 ItemTypeView::ItemTypeView(DataBase& db, InventoryUse use, QWidget* parent)
@@ -34,6 +36,9 @@ void ItemTypeView::updateView()
 
 void ItemTypeView::removeButtonClicked()
 {
+    bool remove = PopUpMessage::confirm(PopUpCode::CONFIRM_TO_REMOVE_ITEM_TYPE, this);
+    if (!remove) { return; }
+
     int row = table_->selectedRowIndex();
     int id = itemTypeModel_->getId(row);
 

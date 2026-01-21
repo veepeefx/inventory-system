@@ -6,7 +6,9 @@ enum class PopUpCode {
     SETTINGS_RESTART,
     MISSING_INFO_ITEM,
     MISSING_INFO_ITEM_TYPE,
-    ITEM_HAS_ITEM_TYPE
+    ITEM_HAS_ITEM_TYPE,
+    CONFIRM_TO_REMOVE_ITEM,
+    CONFIRM_TO_REMOVE_ITEM_TYPE
 };
 
 class PopUpMessage {
@@ -53,6 +55,14 @@ private:
             case PopUpCode::ITEM_HAS_ITEM_TYPE:
                 return "This item already has item type!\n"
                        "Are you sure you want to add it?";
+
+            case PopUpCode::CONFIRM_TO_REMOVE_ITEM:
+                return"You are removing item permanently!\n"
+                       "Are you sure you want to remove this item?";
+
+            case PopUpCode::CONFIRM_TO_REMOVE_ITEM_TYPE:
+                return "You are removing item type permanently!\n"
+                       "Are you sure you want to remove this item type?";
 
             default: return "Missing pop up message";
         }

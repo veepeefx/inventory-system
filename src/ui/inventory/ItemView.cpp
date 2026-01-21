@@ -37,6 +37,9 @@ void ItemView::updateView()
 
 void ItemView::removeButtonClicked()
 {
+    bool remove = PopUpMessage::confirm(PopUpCode::CONFIRM_TO_REMOVE_ITEM, this);
+    if (!remove) { return; }
+
     int row = table_->selectedRowIndex();
     int id = itemModel_->getId(row);
 
