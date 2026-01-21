@@ -23,8 +23,8 @@ public:
     ~MainWindow() override;
 
 private:
-
     QSize WINDOW_SIZE = {1000, 600};
+    QSize BUTTON_SIZE = {200, 75};
 
     QStackedWidget* viewStack_;
     QGridLayout *mainLayout_;
@@ -32,11 +32,12 @@ private:
     void initViews(DataBase& db);
     void initMainMenu();
 
-    QSize BUTTON_SIZE = {200, 75};
-
 private slots:
     void onItemsButtonClicked();
     void onItemTypeButtonClicked();
+    void onSuppliersButtonClicked();
+
+    void onStocktakingButtonClicked();
     void onSettingsButtonClicked();
     void onExitButtonClicked();
 

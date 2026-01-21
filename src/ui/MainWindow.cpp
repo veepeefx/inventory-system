@@ -52,6 +52,7 @@ void MainWindow::initMainMenu()
     QPushButton* suppliersButton = new QPushButton("Suppliers");
     connect(itemsButton, &QPushButton::clicked, this, &MainWindow::onItemsButtonClicked);
     connect(itemTypeButton, &QPushButton::clicked, this, &MainWindow::onItemTypeButtonClicked);
+    connect(suppliersButton, &QPushButton::clicked, this, &MainWindow::onSuppliersButtonClicked);
     suppliersButton->setEnabled(false);
     suppliersButton->setToolTip("Future feature...");
     mainLayout_->addWidget(itemsButton, 0, column);
@@ -84,6 +85,7 @@ void MainWindow::initMainMenu()
     QPushButton* exitButton = new QPushButton("Exit");
     stocktakingButton->setEnabled(false);
     stocktakingButton->setToolTip("Future feature...");
+    connect(stocktakingButton, &QPushButton::clicked, this, &MainWindow::onStocktakingButtonClicked);
     connect(settingsButton, &QPushButton::clicked, this, &MainWindow::onSettingsButtonClicked);
     connect(exitButton, &QPushButton::clicked, this, &MainWindow::onExitButtonClicked);
     mainLayout_->addWidget(stocktakingButton, 0, column);
@@ -92,10 +94,8 @@ void MainWindow::initMainMenu()
 
     // set all buttons to size
     for (int i = 0; i < mainLayout_->count(); ++i) {
-        if (QWidget* widget = mainLayout_->itemAt(i)->widget()) {
-            if (QPushButton* button = qobject_cast<QPushButton*>(widget)) {
-                button->setFixedSize(BUTTON_SIZE);
-            }
+        if (QPushButton* button = qobject_cast<QPushButton*>(mainLayout_->itemAt(i)->widget())) {
+            button->setFixedSize(BUTTON_SIZE);
         }
     }
 }
@@ -108,6 +108,16 @@ void MainWindow::onItemsButtonClicked()
 void MainWindow::onItemTypeButtonClicked()
 {
     viewStack_->setCurrentIndex(Views::INVENTORY_ITEM_TYPES);
+}
+
+void MainWindow::onSuppliersButtonClicked()
+{
+    // viewStack_->setCurrentIndex(Views::INVENTORY_SUPPLIERS);
+}
+
+void MainWindow::onStocktakingButtonClicked()
+{
+    // viewStack_->setCurrentIndex(Views::STOCKTAKING);
 }
 
 void MainWindow::onSettingsButtonClicked()
