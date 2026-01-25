@@ -12,7 +12,7 @@
 
 
 InventoryView::InventoryView(DataBase& db, InventoryUse use, QWidget *parent)
-: QWidget(parent), db_(db), use_(use)
+: View(parent), db_(db), use_(use)
 {
     mainLayout_ = new QVBoxLayout(this);
 
@@ -100,6 +100,15 @@ void InventoryView::initSelectingControls()
     layout->addWidget(selectButton);
 
     mainLayout_->addLayout(layout);
+}
+
+void InventoryView::viewShown()
+{
+    // update view to display cleared inv
+    lastSearch_ = {};
+    updateView();
+
+    // TODO clear searches
 }
 
 Search InventoryView::getSearch(const std::vector<SearchFieldWidget*>& searchFields)

@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QStackedWidget>
 
+#include "View.h"
 #include "../database/DataBase.h"
 
 enum Views {
@@ -29,19 +30,17 @@ private:
     QStackedWidget* viewStack_;
     QGridLayout *mainLayout_;
 
+    // adds to viewStack_ and connects return to main menu
+    void addView(View* view);
+
     void initViews(DataBase& db);
     void initMainMenu();
 
 private slots:
-    void onItemsButtonClicked();
-    void onItemTypeButtonClicked();
-    void onSuppliersButtonClicked();
-
-    void onStocktakingButtonClicked();
-    void onSettingsButtonClicked();
+    void viewChanged(int index);
+    void setViewIndex(int index);
     void onExitButtonClicked();
 
-    void switchViewToMainMenu();
 };
 
 

@@ -14,7 +14,7 @@
 #include <QSpinBox>
 
 
-SettingsView::SettingsView(QWidget *parent) : QWidget(parent)
+SettingsView::SettingsView(QWidget *parent) : View(parent)
 {
     mainLayout_ = new QVBoxLayout(this);
     QLabel* settingsLabel = new QLabel("Settings:");
@@ -120,6 +120,11 @@ void SettingsView::deleteSearchField()
 {
     delete allSearchFields.back();
     allSearchFields.pop_back();
+}
+
+void SettingsView::viewShown()
+{
+    // TODO set settings correctly when shown
 }
 
 void SettingsView::updateSearch(int val)

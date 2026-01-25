@@ -5,9 +5,10 @@
 #include "../../database/DataBase.h"
 #include "../../utils/ui/SearchFieldWidget.h"
 #include "CustomTableView.h"
+#include "../View.h"
 
 
-class InventoryView : public QWidget {
+class InventoryView : public View {
     Q_OBJECT
 
 public:
@@ -28,6 +29,8 @@ protected:
     void initEditingControls();
     void initSelectingControls();
 
+    void viewShown() override;
+
     // returns Search struct from ui given by user
     static Search getSearch(const std::vector<SearchFieldWidget*>& searchFields);
 
@@ -35,8 +38,6 @@ protected:
     virtual void makeSearch(const std::vector<SearchFieldWidget*>& searchFields) = 0;
 
 signals:
-    // return button (in editing mode)
-    void returnMainMenu();
     // returns selected rows id (in selecting mode)
     void selectedId(int id);
 
