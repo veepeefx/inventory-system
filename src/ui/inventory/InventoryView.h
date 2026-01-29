@@ -41,6 +41,9 @@ signals:
     // returns selected rows id (in selecting mode)
     void selectedId(int id);
 
+    // sets default search parameters
+    void clearSearches();
+
 private slots:
     virtual void updateView() = 0;
     virtual void openEditor(int row = -1) = 0;

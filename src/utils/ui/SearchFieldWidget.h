@@ -20,12 +20,12 @@ public:
         QHBoxLayout* layout = new QHBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
 
-        label_ = new QLabel("Parameter " + QString::number(index + 1) + ":", this);
+        QLabel* label = new QLabel("Parameter " + QString::number(index + 1) + ":", this);
         typeComboBox_ = new QComboBox();
         modeComboBox_ = new QComboBox();
         caseSensitiveBox_ = new QCheckBox("Case Sensitivity");
 
-        layout->addWidget(label_);
+        layout->addWidget(label);
         layout->addWidget(modeComboBox_);
 
         if (searchBar) {
@@ -66,8 +66,13 @@ public:
         if (lineEdit_) { lineEdit_->setFixedWidth(200); }
     }
 
+    void reset(int index)
+    {
+        lineEdit_->clear();
+        setSettings(index);
+    }
+
 private:
-    QLabel* label_ = nullptr;
     QComboBox* typeComboBox_ = nullptr;
     QComboBox* modeComboBox_ = nullptr;
     QCheckBox* caseSensitiveBox_ = nullptr;

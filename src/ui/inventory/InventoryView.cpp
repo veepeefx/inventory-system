@@ -36,7 +36,7 @@ void InventoryView::initSearchBar()
     layout->addWidget(searchLabel);
 
     std::vector<SearchFieldWidget*> searchFields;
-    int fieldCount = SettingsManager::getSettings().searchFields.size();
+    int fieldCount = static_cast<int>(SettingsManager::getSettings().searchFields.size());
     for (int i = 0; i < fieldCount; i++) {
         SearchFieldWidget* search = new SearchFieldWidget(i, true, this);
         search->applyInventorySizes();
@@ -50,6 +50,13 @@ void InventoryView::initSearchBar()
 
     connect(searchButton, &QPushButton::clicked, this, [this, searchFields]() {
         makeSearch(searchFields);
+    });
+
+    // allows to reset searches when user reenters inventory
+    connect(this, &InventoryView::clearSearches, this, [searchFields]() {
+        for (int i = 0; i < searchFields.size(); i++) {
+            searchFields.at(i)->reset(i);
+        }
     });
 
     mainLayout_->addLayout(layout);
@@ -108,7 +115,8 @@ void InventoryView::viewShown()
     lastSearch_ = {};
     updateView();
 
-    // TODO clear searches
+    // reset search parameters
+    emit clearSearches();
 }
 
 Search InventoryView::getSearch(const std::vector<SearchFieldWidget*>& searchFields)
